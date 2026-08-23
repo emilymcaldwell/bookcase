@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bookcase</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============================================================
+     APP SHELL
+     ============================================================ -->
+<div class="app" id="app">
+
+  <nav class="nav" id="nav" aria-label="Filter by status">
+    <h1 class="brand"><img class="logo" src="assets/favicon.svg" alt=""><span>Bookcase</span></h1>
+    <div class="nav-chips" id="chips"><!-- filter chips injected here --></div>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary nav-add" data-act="add">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+      Add a book
+    </button>
+  </nav>
+
+  <header class="top">
+    <div class="top-row">
+      <h1 class="brand"><img class="logo" src="assets/favicon.svg" alt=""><span>Bookcase</span></h1>
+      <div class="top-actions">
+        <button class="iconbtn" data-act="sort-menu" id="sortbtn" aria-label="Sort order" aria-haspopup="menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4-4 4 4"></path><path d="M7 4v16"></path><path d="M21 16l-4 4-4-4"></path><path d="M17 20V4"></path></svg>
+          <span class="btn-badge sorted hidden" id="sortbadge"></span>
+        </button>
+        <button class="iconbtn btn-search-toggle" data-act="search-toggle" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>
+        </button>
+        <button class="iconbtn" data-act="backup" aria-label="Cloud backup" id="cloudbtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.5 1.5A3.5 3.5 0 0 1 17 18z"></path></svg>
+          <span class="btn-badge hidden" id="cloudbadge"></span>
+        </button>
+      </div>
+    </div>
+    <div class="searchwrap">
+      <input type="search" class="search" id="search" name="book-search" placeholder="Search title or author" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore>
+    </div>
+  </header>
+
+  <div class="listwrap" id="listwrap">
+    <div class="listhead">
+      <div class="h-pill"></div>
+      <div class="h-title">TITLE</div>
+      <div class="h-author">AUTHOR</div>
+      <div class="h-date">DATE READ</div>
+      <div class="h-edited"></div>
+      <div class="h-heart"></div>
+    </div>
+    <div id="list"></div>
+  </div>
+
+  <!-- detail: overlay on phone, third column on desktop.
+       It must live INSIDE .app so the desktop grid can place it. -->
+  <section class="detail" id="detail" aria-label="Book detail"></section>
+
+</div>
+
+<button class="fab" data-act="add" aria-label="Add a book">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+</button>
+
+<div class="savebar" id="savebar">
+  <button class="savebar-open" data-act="backup">
+    <span class="sdot unsaved" id="savebar-dot"></span>
+    <span class="savebar-text">
+      <span class="savebar-title" id="savebar-title">Unsaved changes</span>
+      <span class="savebar-sub" id="savebar-sub"></span>
+    </span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+  </button>
+  <span class="savebar-div"></span>
+  <button class="btn btn-save" data-act="push">Save</button>
+</div>
+
+<div class="scrim" id="scrim" data-act="scrim"></div>
+
+<!-- ============================================================
+     SHEETS
+     ============================================================ -->
+
+<!-- add / edit form -->
+<form class="sheet" id="sheet-form" novalidate>
+  <div class="handle"></div>
+  <div class="sheet-head">
+    <h2 id="form-heading">Add a book</h2>
+    <button type="button" class="iconbtn" data-act="close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </button>
+  </div>
+
+  <div class="form-2up">
+    <div class="field">
+      <label for="f-title">Title</label>
+      <input class="input" id="f-title" name="title" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="f-author">Author</label>
+      <input class="input" id="f-author" name="author" placeholder="Optional" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Status</label>
+    <div class="picker" id="f-status"><!-- status choices injected here --></div>
+  </div>
+
+  <div class="field hidden" id="f-datewrap">
+    <label for="f-date">Date read <span class="hint">— kept only while the status is Read</span></label>
+    <input class="input" id="f-date" name="readDate" type="date">
+  </div>
+
+  <div class="setrow">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+    <span class="grow">Favourite</span>
+    <button type="button" class="toggle" id="f-fave" data-act="fave" aria-pressed="false" aria-label="Favourite"><span class="knob"></span></button>
+  </div>
+
+  <button type="button" class="setrow" id="f-noteadd" data-act="note-add">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+    <span class="grow quiet">Add a note</span>
+  </button>
+
+  <div class="field hidden" id="f-noteswrap">
+    <label for="f-notes">Notes</label>
+    <textarea class="textarea" id="f-notes" name="notes" placeholder="Anything you want to remember about it"></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-block">Save</button>
+</form>
+
+<!-- backup -->
+<div class="sheet" id="sheet-backup" role="dialog" aria-modal="true" aria-label="Cloud backup">
+  <div class="handle"></div>
+  <div class="sheet-head">
+    <h2>Cloud backup</h2>
+    <button class="iconbtn" data-act="close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </button>
+  </div>
+
+  <div class="status-card" id="backup-status"></div>
+
+  <div class="field" id="backup-actions">
+    <button class="btn btn-primary btn-block" data-act="push" id="backup-push">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V9M7.5 13.5L12 9l4.5 4.5M5 5h14"></path></svg>
+      Save to cloud
+    </button>
+    <p class="caption">Writes this device's copy over the gist.</p>
+  </div>
+
+  <div class="field" id="backup-pull">
+    <button class="btn btn-outline btn-block" data-act="pull" id="backup-pullbtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19h14"></path></svg>
+      Load from cloud
+    </button>
+    <p class="caption" id="backup-pullwarn">Replaces everything on this device.</p>
+  </div>
+
+  <button class="linkrow" data-act="settings">
+    <span class="grow">
+      <b id="backup-conn">Not connected</b>
+      <span id="backup-gist"></span>
+    </span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+  </button>
+
+  <p class="msg" id="backup-msg"></p>
+</div>
+
+<!-- settings -->
+<div class="sheet" id="sheet-settings" role="dialog" aria-modal="true" aria-label="Cloud settings">
+  <div class="handle"></div>
+  <div class="sheet-head">
+    <button class="iconbtn" data-act="backup" aria-label="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <h2>Cloud settings</h2>
+  </div>
+
+  <div class="field">
+    <label for="s-gist">Gist ID</label>
+    <input class="input mono" id="s-gist" name="gist-ref" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="a1b2c3d4e5f6…">
+  </div>
+
+  <div class="field">
+    <label for="s-token">Access token</label>
+    <div class="input-affix">
+      <input class="input mono masked" id="s-token" name="gist-ref-secret" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="ghp_…">
+      <button type="button" class="affix-btn" data-act="reveal" aria-label="Show token" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="2.8"></circle></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="callout">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8.5v5M12 16.8v.2"></path></svg>
+    <span>The token is kept in this browser only, in plain text. Give it gist access and nothing else, so a leak can't reach the rest of your account.</span>
+  </div>
+
+  <button class="btn btn-primary btn-block" data-act="connect" id="s-connect">Connect</button>
+  <button class="btn btn-outline btn-block hidden" data-act="disconnect" id="s-disconnect">Disconnect</button>
+
+  <p class="msg" id="settings-msg"></p>
+</div>
+
+<!-- conflict -->
+<div class="sheet" id="sheet-conflict" role="dialog" aria-modal="true" aria-label="Conflict">
+  <div class="handle"></div>
+  <div class="sheet-head">
+    <span class="sdot conflict"></span>
+    <h2>The cloud copy has changed</h2>
+  </div>
+  <p class="caption" id="conflict-body"></p>
+  <div class="compare" id="conflict-compare"></div>
+  <button class="choice-btn" data-act="conflict-pull">
+    <b>Load the cloud copy</b>
+    <span id="conflict-pullcost">Discards your unsaved changes</span>
+  </button>
+  <button class="choice-btn danger" data-act="conflict-force">
+    <b>Overwrite the cloud</b>
+    <span>Discards what the other device saved</span>
+  </button>
+  <button class="btn btn-quiet btn-block" data-act="close">Cancel</button>
+</div>
+
+<!-- sort order menu -->
+<div class="menu" id="sortmenu" role="menu" aria-label="Sort order"><!-- built by the script --></div>
+
+<!-- detail overflow menu -->
+<div class="menu" id="menu" role="menu">
+  <button data-act="edit" role="menuitem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16z"></path><path d="M13.5 6.5l4 4"></path></svg>
+    Edit details
+  </button>
+  <button data-act="delete" role="menuitem" class="danger">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5h4v2M8 7l1 12h6l1-12"></path></svg>
+    Delete book
+  </button>
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
