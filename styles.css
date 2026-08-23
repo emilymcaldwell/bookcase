@@ -648,6 +648,7 @@ input[type="date"] { height: var(--ctl-h); font-family: var(--font); }
 }
 .detail-line .grow { flex: 1; color: var(--muted); }
 .detail-line svg { width: var(--icon-sm); height: var(--icon-sm); color: var(--muted); flex-shrink: 0; }
+.detail-date { font-family: var(--font-mono); font-size: var(--fs-md); }
 
 .notes-box {
   min-height: var(--notes-min);
@@ -869,6 +870,7 @@ input[type="date"] { height: var(--ctl-h); font-family: var(--font); }
     min-height: var(--tap);
     border-bottom: var(--bw) solid var(--line);
     font-size: var(--fs-xs);
+    font-weight: var(--fw-sb);
     letter-spacing: var(--ls-wide);
     color: var(--faint);
     position: sticky;
@@ -882,7 +884,7 @@ input[type="date"] { height: var(--ctl-h); font-family: var(--font); }
   .row:last-child { border-bottom: var(--bw) solid var(--line-soft); }
   .row-meta { display: none; }
   .row-author { display: block; font-size: var(--fs-md); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .row-date { display: block; font-size: var(--fs-md); color: var(--muted); }
+  .row-date { display: block; font-size: var(--fs-md); font-family: var(--font-mono); color: var(--muted); }
   /* the columns answer to the header here, so the unlit dot holds its place */
   .row-edited:not(.on) { display: block; }
   .row-date.none { color: var(--border-mute); }

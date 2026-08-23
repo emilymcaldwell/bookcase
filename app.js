@@ -206,14 +206,6 @@ function ordinal(n) {
   return one === 1 ? "st" : one === 2 ? "nd" : one === 3 ? "rd" : "th";
 }
 
-function fmtDate(iso) { // "2026-07-14" → "Jul 14th, 2026"
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
-  if (!m) return iso || "";
-  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
-  if (!MONTHS[mo - 1]) return iso;
-  return `${MONTHS[mo - 1]} ${d}${ordinal(d)}, ${y}`;
-}
-
 function fmtStamp(when) { // → "Aug 23rd, 3:07 pm"
   const d = new Date(when);
   if (isNaN(d)) return "";
@@ -349,13 +341,13 @@ function renderList() {
   el.list.innerHTML = list.map((b) => {
     const s = STATUS_BY_KEY[b.status];
     const d = displayDate(b);
-    const meta = [esc(b.author), d ? fmtDate(d) : null].filter(Boolean).join(" · ");
+    const meta = [esc(b.author), d ? esc(d) : null].filter(Boolean).join(" · ");
     const touched = sync.touched.includes(b.id);
     return `<button class="row${s.dim ? " done" : ""}${b.id === ui.selected ? " selected" : ""}" data-act="open" data-id="${b.id}">` +
       `<span class="pill ${s.key}"><span class="pdot"></span>${s.short}</span>` +
       `<span class="row-main"><span class="row-title">${esc(titleOf(b))}</span><span class="row-meta">${meta}</span></span>` +
       `<span class="row-author">${esc(b.author)}</span>` +
-      `<span class="row-date${d ? "" : " none"}">${d ? fmtDate(d) : "—"}</span>` +
+      `<span class="row-date${d ? "" : " none"}">${d ? esc(d) : "—"}</span>` +
       `<span class="row-edited${touched ? " on" : ""}"></span>` +
       `<span class="row-heart">${b.fave ? `<span class="heart">${HEART_SVG}</span>` : ""}</span>` +
       `</button>`;
@@ -397,7 +389,7 @@ function renderDetail() {
       '<div class="detail-line">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>' +
         '<span class="grow">Date Read</span>' +
-        `<span>${d ? fmtDate(d) : "Not set"}</span>` +
+        `<span>${d ? esc(d) : "Not set"}</span>` +
       '</div>' +
       `<div class="detail-block"><div class="section-label">NOTES</div>${notes}</div>` +
     '</div>';
