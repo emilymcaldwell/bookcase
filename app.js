@@ -390,7 +390,7 @@ function renderDetail() {
         ? '<div class="detail-line">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>' +
             '<span class="grow">Date Read</span>' +
-            `<span>${esc(d)}</span>` +
+            `<span class="detail-date">${esc(d)}</span>` +
           '</div>'
         : "") +
       `<div class="detail-block"><div class="section-label">NOTES</div>${notes}</div>` +

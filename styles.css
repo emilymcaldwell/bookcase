@@ -870,7 +870,6 @@ input[type="date"] { height: var(--ctl-h); font-family: var(--font); }
     min-height: var(--tap);
     border-bottom: var(--bw) solid var(--line);
     font-size: var(--fs-xs);
-    font-weight: var(--fw-sb);
     letter-spacing: var(--ls-wide);
     color: var(--faint);
     position: sticky;
