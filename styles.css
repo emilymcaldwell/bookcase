@@ -456,7 +456,7 @@ input[type="date"] { height: var(--ctl-h); font-family: var(--font); }
 .btn-badge.err, .btn-badge.conflict { background: var(--danger); }
 
 /* search: a row of its own, revealed on phone, always on desktop */
-.searchwrap { display: none; }
+.searchwrap { display: none; position: relative; }
 .app.searching .searchwrap { display: block; }
 .search {
   width: 100%;
@@ -464,10 +464,17 @@ input[type="date"] { height: var(--ctl-h); font-family: var(--font); }
   border: var(--bw) solid var(--border-c);
   border-radius: var(--r-full);
   background: var(--card);
-  padding: 0 var(--sp-4);
+  padding: 0 var(--affix-w) 0 var(--sp-4);
   font-size: var(--fs-input);
 }
 .search:focus { border-color: var(--ink); }
+
+/* the browser's own clear button is off; the app draws its own so the
+   x matches the rest of the iconography */
+.search::-webkit-search-cancel-button,
+.search::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+.search-clear { display: none; }
+.search:not(:placeholder-shown) + .search-clear { display: flex; }
 
 /* --- nav / filters --- */
 .nav {

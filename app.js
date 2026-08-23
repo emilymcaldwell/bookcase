@@ -842,6 +842,12 @@ document.addEventListener("click", (e) => {
       renderAll();
       if (ui.searching) el.search.focus();
       break;
+    case "search-clear":
+      ui.query = "";
+      el.search.value = "";
+      renderList();
+      el.search.focus();
+      break;
     case "sort-menu":
       if (ui.menu === "sort") closeMenus();
       else openMenu("sort", actEl);
@@ -974,6 +980,15 @@ window.addEventListener("beforeunload", (e) => {
 /* ------------------------------------------------------------
    Boot
    ------------------------------------------------------------ */
+
+/* iOS Safari zooms the page when a focused field's font-size is under
+   16px. Capping the viewport scale suppresses that auto-zoom, and Safari
+   still allows pinch-zoom regardless of the cap — but Android Chrome
+   would honour it and lock pinch-zoom out, so the cap is iOS-only. */
+if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+  document.querySelector('meta[name="viewport"]').content += ", maximum-scale=1";
+}
+
 (function init() {
   const rawBooks = load(KEYS.books, []);
   books = (Array.isArray(rawBooks) ? rawBooks : []).map(normalise);
