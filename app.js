@@ -341,7 +341,7 @@ function renderList() {
   el.list.innerHTML = list.map((b) => {
     const s = STATUS_BY_KEY[b.status];
     const d = displayDate(b);
-    const meta = [esc(b.author), d ? esc(d) : null].filter(Boolean).join(" · ");
+    const meta = [esc(b.author), d ? `<span class="meta-date">${esc(d)}</span>` : null].filter(Boolean).join(" · ");
     const touched = sync.touched.includes(b.id);
     return `<button class="row${s.dim ? " done" : ""}${b.id === ui.selected ? " selected" : ""}" data-act="open" data-id="${b.id}">` +
       `<span class="pill ${s.key}"><span class="pdot"></span>${s.short}</span>` +
