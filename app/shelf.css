@@ -100,6 +100,16 @@ html { scrollbar-gutter: stable; }
   border-bottom: 1px solid var(--border);
 }
 
+/* The topbar is pinned at every width. Both halves are their own grid item in
+ * row 1, and both carry the raised ground and the hairline already, so they
+ * stick as one bar with the list passing underneath. */
+.app__brand,
+.app__bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
 .app__actions {
   display: flex;
   align-items: center;
@@ -188,8 +198,6 @@ html { scrollbar-gutter: stable; }
   grid-area: content;
   min-width: 0;
   padding: var(--space-4);
-  /* Clear of both the floating Add book and the home indicator. */
-  padding-bottom: calc(var(--space-safe-bottom) + var(--space-8));
 }
 
 /* ─── Filter pills (phone) ────────────────────────────────────────────────
@@ -276,7 +284,7 @@ html { scrollbar-gutter: stable; }
 .fab {
   position: fixed;
   right: var(--space-4);
-  bottom: var(--space-safe-bottom);
+  bottom: var(--space-4);
   z-index: 10;
   width: 56px;
   height: 56px;
@@ -520,7 +528,7 @@ html { scrollbar-gutter: stable; }
   align-items: stretch;
   gap: var(--space-3);
   margin: 0;
-  padding: 0 var(--space-4) var(--space-safe-bottom);
+  padding: 0 var(--space-4) var(--space-4);
 }
 
 /* A confirmation keeps its rules: it is a dialog at every width. */
@@ -669,13 +677,6 @@ html { scrollbar-gutter: stable; }
     grid-template-areas:
       "brand bar"
       "side  content";
-  }
-
-  .app__brand,
-  .app__bar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
   }
 
   .app__brand {
