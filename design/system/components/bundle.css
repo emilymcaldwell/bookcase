@@ -1,0 +1,661 @@
+/* Design System — bundle.css
+ *
+ * Loads AFTER tokens.css. It redeclares the eleven colour tokens as light-dark()
+ * pairs so one declaration serves both schemes, derives every variation with
+ * color-mix(), defines the one overlay shadow, and carries the component classes.
+ *
+ * Contract: raw hex appears once, in the --_*-l / --_*-d primitives below.
+ * Nothing else in this file, or in any consumer, writes a colour literal.
+ * There are no transitions and no animations anywhere in this system.
+ */
+
+@font-face {
+  font-family: "Switzer";
+  src: url("../fonts/Switzer-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Switzer";
+  src: url("../fonts/Switzer-VariableItalic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Commit Mono. The file's default instance is 200, so the range matters:
+ * without it every use would render extra-light. It also carries an `ital`
+ * axis the system does not use — there is no mono italic here. */
+@font-face {
+  font-family: "Commit Mono";
+  src: url("../fonts/CommitMono.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Scheme ──────────────────────────────────────────────────────────────
+ * No [data-theme]        → color-scheme: light dark → follows the OS.
+ * [data-theme="light"]   → forced light.
+ * [data-theme="dark"]    → forced dark.
+ * light-dark() resolves against the *used* element's color-scheme, so any
+ * subtree can be pinned with .scheme-light / .scheme-dark (see Utilities).
+ */
+
+:root,
+:root[data-theme] {
+  color-scheme: light dark;
+
+  /* The only hex in the system. */
+  --_surface-l: #f7f7f7;
+  --_surface-d: #111111;
+  --_surface-raised-l: #ffffff;
+  --_surface-raised-d: #1c1c1c;
+  --_surface-sunken-l: #ececec;
+  --_surface-sunken-d: #050505;
+  --_border-l: #d4d4d4;
+  --_border-d: #3a3a3a;
+  --_ink-l: #171717;
+  --_ink-d: #f5f5f5;
+  --_ink-muted-l: #676767;
+  --_ink-muted-d: #8f8f8f;
+  --_accent-l: #9b4a60;
+  --_accent-d: #dd92a3;
+  --_on-accent-l: #ffffff;
+  --_on-accent-d: #141414;
+  --_danger-l: #ba1a1a;
+  --_danger-d: #f4665a;
+  --_status-reading-l: #006e99;
+  --_status-reading-d: #6cb1d8;
+  --_status-read-l: #1e8b39;
+  --_status-read-d: #7dce87;
+  --_status-dropped-l: #992c1d;
+  --_status-dropped-d: #db7a69;
+  --_status-tbr-l: #4a3799;
+  --_status-tbr-d: #877ed6;
+  --_backdrop-l: rgba(0, 0, 0, 0.5);
+  --_backdrop-d: rgba(0, 0, 0, 0.7);
+  --_shadow-near-l: rgba(0, 0, 0, 0.05);
+  --_shadow-near-d: rgba(0, 0, 0, 0.4);
+  --_shadow-far-l: rgba(0, 0, 0, 0.12);
+  --_shadow-far-d: rgba(0, 0, 0, 0.6);
+
+  /* The eleven tokens. */
+  --surface: light-dark(var(--_surface-l), var(--_surface-d));
+  --surface-raised: light-dark(var(--_surface-raised-l), var(--_surface-raised-d));
+  --surface-sunken: light-dark(var(--_surface-sunken-l), var(--_surface-sunken-d));
+  --border: light-dark(var(--_border-l), var(--_border-d));
+  --ink: light-dark(var(--_ink-l), var(--_ink-d));
+  --ink-muted: light-dark(var(--_ink-muted-l), var(--_ink-muted-d));
+  --accent: light-dark(var(--_accent-l), var(--_accent-d));
+  --on-accent: light-dark(var(--_on-accent-l), var(--_on-accent-d));
+  --accent-soft: light-dark(
+    color-mix(in oklab, var(--_accent-l) 14%, var(--_surface-raised-l)),
+    color-mix(in oklab, var(--_accent-d) 22%, var(--_surface-d))
+  );
+
+  /* Destructive actions only. Separated from the accent by chroma (0.19 vs
+   * 0.11 in light, 0.18 vs 0.09 in dark) more than by hue — a vivid alarm red
+   * beside a dusky rose. It is never a fill, so there is no on-danger: nothing
+   * in the system sits on top of it. danger-soft is the hover ground of the
+   * one button that uses it, mixed at the same 14% / 22% as accent-soft. */
+  --danger: light-dark(var(--_danger-l), var(--_danger-d));
+  --danger-soft: light-dark(
+    color-mix(in oklab, var(--_danger-l) 14%, var(--_surface-raised-l)),
+    color-mix(in oklab, var(--_danger-d) 22%, var(--_surface-d))
+  );
+
+  /* The four status hues. These are the one place the palette carries more
+   * than a single accent, and they exist because a reading status is a
+   * category, not an emphasis: four of them sit in one column and have to be
+   * told apart at a glance.
+   *
+   * Each is paired with a `-soft` ground mixed the same way accent-soft is,
+   * and the text on that ground is the hue itself. The dark values are the
+   * light ones carried along the same path the accent already travels between
+   * schemes — lightness +0.22, chroma x0.84, hue held — so the four read as
+   * one family with the rest of the palette rather than as imported colours.
+   *
+   * The dark mix is 16%, not accent-soft's 22%: at 22% the violet falls to
+   * 4.19:1 on its own ground. 16% is the deepest tint at which all four clear
+   * 4.5:1. See the Status hues table in the README for every measurement, and
+   * for the one pair that does not clear it. */
+  --status-reading: light-dark(var(--_status-reading-l), var(--_status-reading-d));
+  --status-read: light-dark(var(--_status-read-l), var(--_status-read-d));
+  --status-dropped: light-dark(var(--_status-dropped-l), var(--_status-dropped-d));
+  --status-tbr: light-dark(var(--_status-tbr-l), var(--_status-tbr-d));
+
+  --status-reading-soft: light-dark(
+    color-mix(in oklab, var(--_status-reading-l) 14%, var(--_surface-raised-l)),
+    color-mix(in oklab, var(--_status-reading-d) 16%, var(--_surface-d))
+  );
+  --status-read-soft: light-dark(
+    color-mix(in oklab, var(--_status-read-l) 14%, var(--_surface-raised-l)),
+    color-mix(in oklab, var(--_status-read-d) 16%, var(--_surface-d))
+  );
+  --status-dropped-soft: light-dark(
+    color-mix(in oklab, var(--_status-dropped-l) 14%, var(--_surface-raised-l)),
+    color-mix(in oklab, var(--_status-dropped-d) 16%, var(--_surface-d))
+  );
+  --status-tbr-soft: light-dark(
+    color-mix(in oklab, var(--_status-tbr-l) 14%, var(--_surface-raised-l)),
+    color-mix(in oklab, var(--_status-tbr-d) 16%, var(--_surface-d))
+  );
+
+  /* The scrim behind a modal. Heavier in dark, though not to darken the ground:
+   * a black scrim barely moves #111111 at any alpha. It collapses the contrast
+   * of the content behind instead — in light the ground falls under dark text,
+   * in dark the text falls over an unmoved ground. The only translucent token. */
+  --backdrop: light-dark(var(--_backdrop-l), var(--_backdrop-d));
+
+  /* The one shadow. light-dark() cannot wrap a multi-layer box-shadow (its own
+   * commas), so the scheme switch sits on each layer's colour instead. */
+  --shadow-overlay:
+    0 1px 2px light-dark(var(--_shadow-near-l), var(--_shadow-near-d)),
+    0 8px 24px light-dark(var(--_shadow-far-l), var(--_shadow-far-d));
+
+  /* Variations. Every one is a color-mix() of a token above — never a new hex.
+   * Mixing toward --ink always means "more contrast against the current
+   * ground", so one declaration reads correctly in both schemes. */
+  --surface-hover: color-mix(in oklab, var(--surface-raised) 93%, var(--ink));
+  --surface-active: color-mix(in oklab, var(--surface-raised) 87%, var(--ink));
+  --surface-sunken-hover: color-mix(in oklab, var(--surface-sunken) 94%, var(--ink));
+  --accent-hover: color-mix(in oklab, var(--accent) 88%, var(--ink));
+  --accent-active: color-mix(in oklab, var(--accent) 78%, var(--ink));
+  --accent-soft-hover: color-mix(in oklab, var(--accent-soft) 92%, var(--ink));
+  --danger-hover: color-mix(in oklab, var(--danger) 88%, var(--ink));
+  --danger-active: color-mix(in oklab, var(--danger) 78%, var(--ink));
+  --border-hover: color-mix(in oklab, var(--border) 80%, var(--ink));
+  --ink-disabled: color-mix(in oklab, var(--ink) 38%, var(--surface));
+  --border-disabled: color-mix(in oklab, var(--border) 45%, var(--surface));
+  /* The switch knob when off: the lightest value each scheme holds. Not
+   * on-accent (near-black in dark) and not surface-raised (#1c1c1c in dark),
+   * both of which would put a dark dot on a dark-grey track. */
+  --switch-knob: light-dark(var(--_surface-raised-l), var(--_ink-d));
+
+  /* The bottom padding that keeps a pinned footer or a bottom sheet clear of a
+   * phone's home indicator. A --space-7 floor, raised to the device's own inset
+   * wherever it reports a larger one; env() resolves to 0 on anything with no
+   * indicator, so the floor is what ships everywhere else. The page has to ask
+   * for the inset — <meta name="viewport" content="…, viewport-fit=cover">. */
+  --space-safe-bottom: max(var(--space-7), env(safe-area-inset-bottom, 0px));
+
+  /* How far a region recedes while it is inert because an overlay is open over
+   * it and NOT covered by a scrim: the page behind a popover or a menu. An
+   * opacity rather than a colour, so one value is correct in both schemes and
+   * no new ground enters the palette. Anything behind `backdrop` is already
+   * handled by the scrim — never put both on the same region. */
+  --dim-inert: 0.4;
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+/* ─── Base ──────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+.ds-app {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+*, *::before, *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+:where(a) { color: var(--accent); text-underline-offset: 2px; }
+
+/* ─── Mono ──────────────────────────────────────────────────────────────
+ * Commit Mono's x-height (0.540em) all but matches Switzer's (0.531em), so
+ * mono needs no size correction: `.num` (declared last in this file) swaps
+ * the family and nothing else, and the line it sits in keeps its rhythm.
+ * Monospaced digits are tabular by construction, so columns of figures align
+ * without font-feature-settings. */
+
+:where(code, kbd, samp, pre) {
+  font-family: var(--font-mono);
+  font-size: 1em;
+  font-weight: 400;
+}
+
+:where(code, kbd) {
+  background: var(--surface-sunken);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-1);
+}
+
+pre {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+pre code { background: none; border-radius: 0; padding: 0; }
+
+:where(.btn, .check input, .field-input, .field-area, .theme-toggle):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ─── Utilities ─────────────────────────────────────────────────────────── */
+
+.scheme-light { color-scheme: light; }
+.scheme-dark { color-scheme: dark; }
+
+/* A region that is inert behind an overlay carrying no scrim. Pair it with the
+ * `inert` attribute — this makes the state visible, it does not enforce it.
+ * Not for anything behind .backdrop, which already does this job. */
+.dim-inert { opacity: var(--dim-inert); pointer-events: none; }
+
+.ds-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+.ds-stack { display: flex; flex-direction: column; gap: var(--space-4); }
+.ds-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+
+/* ─── Selection and hover ───────────────────────────────────────────────
+ * Two different signals, two different grounds, and they never share one.
+ *   hover     → surface-sunken-hover + ink    "your pointer is here"
+ *   selected  → accent-soft         + accent  "this one is chosen"
+ * The accent is reserved for the second, on anything that has both states.
+ * The hover ground is sunken taken one step deeper, because a neutral badge
+ * already rests on plain sunken — hovering to the same value would change
+ * nothing but the text.
+ *
+ * Keyed off the ARIA that already has to be there, so the look cannot drift
+ * from what a screen reader is told. Selected is declared after hover, so a
+ * selected item keeps its ground while the pointer is over it — that is
+ * deliberate, and a hover tint on top of accent-soft is not available
+ * anyway: deepening it drops accent text to 4.0:1 in light. */
+
+.selectable:hover {
+  background: var(--surface-sunken-hover);
+  color: var(--ink);
+}
+
+.selectable[aria-pressed="true"],
+.selectable[aria-selected="true"],
+.selectable[data-selected] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: transparent;
+}
+
+/* Anything that draws over the page without a backdrop: menu, dropdown,
+ * popover, tooltip, autocomplete. The border is the edge, the shadow is lift. */
+.overlay {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+}
+
+/* The scrim behind a modal or a sheet. The panel on top is an ordinary .card
+ * and takes NO shadow: shadow-overlay is for things that float with nothing
+ * behind them, and here the scrim is already doing that work — in dark a black
+ * shadow on a scrimmed ground would be invisible anyway. The modal's own
+ * border is what draws its edge, in both schemes. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--backdrop);
+}
+
+/* Native <dialog> gets the same scrim. ::backdrop inherits from its originating
+ * element in current browsers, so var() and light-dark() resolve here. */
+dialog::backdrop { background: var(--backdrop); }
+
+/* ─── Button ────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding-inline: var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.btn--sm { min-height: 32px; padding-inline: var(--space-3); font-size: 12px; }
+.btn--lg { min-height: 48px; padding-inline: var(--space-5); font-size: 16px; }
+
+.btn--primary { background: var(--accent); color: var(--on-accent); }
+.btn--primary:hover { background: var(--accent-hover); }
+.btn--primary:active { background: var(--accent-active); }
+
+.btn--secondary {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border-color: var(--border);
+}
+.btn--secondary:hover { background: var(--surface-hover); border-color: var(--border-hover); }
+.btn--secondary:active { background: var(--surface-active); }
+
+.btn--danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.btn--danger:hover {
+  background: var(--danger-soft);
+  color: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+.btn--danger:active {
+  background: var(--danger-soft);
+  color: var(--danger-active);
+  border-color: var(--danger-active);
+}
+
+.btn--ghost { background: transparent; color: var(--accent); }
+.btn--ghost:hover { background: var(--accent-soft); }
+.btn--ghost:active { background: var(--accent-soft-hover); color: var(--accent-active); }
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  background: transparent;
+  color: var(--ink-disabled);
+  border-color: var(--border-disabled);
+}
+
+/* ─── Card ──────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.card__title { margin: 0 0 var(--space-2); }
+.card__body { margin: 0; color: var(--ink-muted); }
+.card__footer { margin-top: var(--space-5); display: flex; gap: var(--space-3); }
+
+/* ─── Field ─────────────────────────────────────────────────────────────── */
+
+.field { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.field__label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
+
+.field-input,
+.field-area {
+  width: 100%;
+  min-height: 40px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.field-area { min-height: 96px; resize: vertical; }
+
+.field-input::placeholder,
+.field-area::placeholder { color: var(--ink-muted); }
+
+.field-input:hover,
+.field-area:hover { border-color: var(--border-hover); }
+
+.field-input:disabled,
+.field-area:disabled {
+  color: var(--ink-disabled);
+  border-color: var(--border-disabled);
+  background: var(--surface);
+  cursor: not-allowed;
+}
+
+.field__hint { font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+
+.field[data-invalid] .field-input,
+.field[data-invalid] .field-area { border-color: var(--ink); border-width: 2px; }
+.field[data-invalid] .field__hint { color: var(--ink); font-weight: 500; }
+
+/* ─── Badge ─────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 24px;
+  padding-inline: var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.badge--neutral { background: var(--surface-sunken); border-color: transparent; color: var(--ink-muted); }
+.badge--solid { background: var(--accent); color: var(--on-accent); }
+
+/* Status badges. Same shape and the same soft-ground-plus-its-own-hue pairing
+ * as the default badge; only the hue differs. The word still carries the
+ * meaning — these four are a second signal, never the first. */
+.badge--reading { background: var(--status-reading-soft); color: var(--status-reading); }
+.badge--read { background: var(--status-read-soft); color: var(--status-read); }
+.badge--dropped { background: var(--status-dropped-soft); color: var(--status-dropped); }
+.badge--tbr { background: var(--status-tbr-soft); color: var(--status-tbr); }
+
+/* ─── Checkbox · Radio · Switch ─────────────────────────────────────────── */
+
+.check {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+}
+
+.check input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  display: grid;
+  place-content: center;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.check input::after {
+  content: "";
+  width: 10px;
+  height: 5px;
+  margin-top: -3px;
+  border-left: 2px solid var(--on-accent);
+  border-bottom: 2px solid var(--on-accent);
+  rotate: -45deg;
+  opacity: 0;
+}
+
+.check input:checked,
+.check input:indeterminate { background: var(--accent); border-color: var(--accent); }
+.check input:checked::after { opacity: 1; }
+
+.check input:indeterminate::after {
+  width: 10px;
+  height: 0;
+  margin-top: 0;
+  border-left: 0;
+  border-bottom: 2px solid var(--on-accent);
+  rotate: none;
+  opacity: 1;
+}
+
+.check:hover input:not(:disabled) { border-color: var(--border-hover); }
+
+.check__hint { display: block; font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+
+.check:has(input:disabled) { cursor: not-allowed; color: var(--ink-disabled); }
+.check input:disabled { border-color: var(--border-disabled); background: var(--surface); cursor: not-allowed; }
+.check input:disabled:checked { background: var(--border-disabled); border-color: var(--border-disabled); }
+
+/* Radio — same row, round box, a dot instead of a tick. */
+
+.check--radio input { border-radius: var(--radius-full); }
+
+.check--radio input::after {
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--on-accent);
+  rotate: none;
+}
+
+/* Switch — a 44x24 track on radius-full. The thumb jumps; nothing slides.
+ * The 20px thumb is the same size as the checkbox and radio boxes, so all
+ * three controls carry a mark of one size. The track is 24px, which is the
+ * body line-height, so it centres on its label with no margin.
+ *
+ * Off is a filled grey track with a light knob, not an outlined empty one:
+ * a filled pill at 1.2:1 against the page still reads, where a 1px line at
+ * the same ratio would not — area carries what a hairline cannot. */
+
+.check--switch input {
+  display: block;
+  position: relative;
+  width: 44px;
+  height: 24px;
+  margin: 0;
+  background: var(--border);
+  border-color: var(--border);
+  border-radius: var(--radius-full);
+}
+
+.check--switch input::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--switch-knob);
+  rotate: none;
+  opacity: 1;
+}
+
+.check--switch input:checked::after {
+  left: auto;
+  right: 1px;
+  background: var(--on-accent);
+}
+
+.check--switch input:disabled,
+.check--switch input:disabled:checked {
+  background: var(--border-disabled);
+  border-color: var(--border-disabled);
+}
+
+/* ─── ThemeToggle ───────────────────────────────────────────────────────── */
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding-inline: var(--space-3);
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.theme-toggle:hover { background: var(--surface-hover); border-color: var(--border-hover); }
+
+.theme-toggle svg { display: none; width: 16px; height: 16px; flex: none; }
+.theme-toggle__text { display: none; }
+
+.theme-toggle[data-state="system"] [data-for="system"],
+.theme-toggle[data-state="light"] [data-for="light"],
+.theme-toggle[data-state="dark"] [data-for="dark"] { display: inline; }
+
+.theme-toggle[data-state="system"] svg[data-for="system"],
+.theme-toggle[data-state="light"] svg[data-for="light"],
+.theme-toggle[data-state="dark"] svg[data-for="dark"] { display: block; }
+
+.theme-toggle--icon { padding-inline: 0; width: 40px; justify-content: center; }
+.theme-toggle--icon .theme-toggle__text { display: none !important; }
+
+/* ─── Breakpoints ───────────────────────────────────────────────────────── */
+
+@media (min-width: 48rem) {
+  .ds-container { max-width: 60rem; padding-inline: var(--space-6); }
+  .h1 { font-size: 40px; line-height: 44px; }
+  .h2 { font-size: 28px; line-height: 34px; }
+  .card { padding: var(--space-6); }
+}
+
+@media (min-width: 75rem) {
+  .ds-container { max-width: 72rem; padding-inline: var(--space-7); }
+  .h1 { font-size: 48px; line-height: 52px; }
+}
+
+/* ─── Mono swap, last word ──────────────────────────────────────────────
+ * `.num` has to out-rank the components that set a family of their own —
+ * .field-input and .btn both do, because a control does not inherit one —
+ * and it ties with them on specificity, so it is declared last on purpose.
+ * Moving it up the file silently stops it working on inputs and buttons. */
+
+.num { font-family: var(--font-mono); letter-spacing: 0; }

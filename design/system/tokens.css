@@ -1,0 +1,141 @@
+/* Design System — generated from tokens.json */
+:root, [data-theme="light"] {
+  --surface: #f7f7f7; /* Page ground. Set it on `body`. True neutral — no hue. Ships in `bundle.css` as `light-dark(#f7f7f7, #111111)`. */
+  --surface-raised: #ffffff; /* Anything sitting on the page: cards, inputs, menus, sheets. The only other ground. `ink` and `ink-muted` both read on it. */
+  --surface-sunken: #ececec; /* A well: something recessed into the page rather than sitting on it — code blocks, empty states, table header rows, scroll and progress tracks, read-only panels, and the neutral badge. It is also the hover ground for anything selectable, one step deeper as `--surface-sunken-hover`. In light it is a step darker than `surface` and still lighter than `border` (#f7f7f7 → #ececec → #d4d4d4). In dark it goes the other way, a step darker than `surface`, because `surface-raised` is what gets lighter there; `border` is lighter than both in that theme, which is inherent to dark mode. Its own fill is the edge — do not also outline it, `border` reads about 1.3:1 against it. `ink`, `ink-muted` and `accent` all read on it — `accent` is 5.0:1 there in light, 8.5:1 in dark. */
+  --border: #d4d4d4; /* Every hairline and every control outline, 1px: card and panel edges, dividers, table rules, inputs, checkbox, radio, the switch track and its off thumb, `btn--secondary`, the overlay edge. Deliberately light — about 1.4:1 on the grounds in light and 1.6:1 in dark. That is below the 3:1 WCAG floor for a control outline, so on a bare input the line alone does not identify it: always give a field a visible `label`, and rely on the `accent` focus ring, which is solid and holds 3:1. */
+  --ink: #171717; /* Body copy and headings on `surface`, `surface-raised` and `accent-soft`. 14:1 or better in both themes. */
+  --ink-muted: #676767; /* Secondary text, field labels, hints, placeholder. On `surface` and `surface-raised` only (5.2:1+). Do not put it on `accent-soft` — 3.8:1 in dark, under the floor. */
+  --accent: #9b4a60; /* The one hue: a dusky rose, deep and slightly mauve in light, lifted and dustier in dark. Primary button fill, link text, focus ring, selected state, and text on `accent-soft`. As text it reads 5.5:1 on `surface`, 5.9:1 on `surface-raised`, 5.0:1 on `surface-sunken` and 4.8:1 on `accent-soft` in light; 5.7:1 or better everywhere in dark. It is a muted rose, not a signal red: that is `danger`, a separate token reserved for destructive actions, separated from this one by chroma (0.19 against 0.11 in light) rather than by hue. */
+  --accent-soft: #f2e5e7; /* The selected ground: badges, chosen filter chips, selected rows and options. It is reserved for selection — a hover uses `surface-sunken` with `ink`, never this. Text on it is `accent` — 4.8:1 in light, 5.7:1 in dark. `ink` also reads on it (14.6:1) where the content is body copy rather than a label. Never `ink-muted`. Derived in `bundle.css` as `color-mix(in oklab, accent 14%, surface-raised)` in light and `22%, surface` in dark — these hex values are that mix resolved. If the accent is ever changed again, re-check `accent` on this tint: it is the tightest pair in the palette. */
+  --on-accent: #ffffff; /* Text and icons on an `accent` fill. It flips: white in light (5.9:1), near-black in dark (7.7:1), because the dark rose is light. Never hard-code white on accent. */
+  --danger: #ba1a1a; /* Destructive actions ONLY — the outline and text of the button that actually deletes, and nothing else. Not validation errors, not a status badge, not a warning: a field's error is still a 2px `ink` border plus the wording. It is never a fill; there is no `on-danger`, because nothing in the system sits on top of it. It is told apart from `accent` by chroma more than hue: 0.19 against the rose's 0.11 in light, 0.18 against 0.09 in dark, 23° apart in both — a vivid alarm red beside a dusky rose. As text and as a 1px outline it reads 5.5:1 or better on every ground in both themes. */
+  --backdrop: rgba(0, 0, 0, 0.5); /* The scrim behind a modal or a sheet — the only translucent token in the system. Heavier in dark on purpose, and not for the reason you would guess: a black scrim barely moves a #111111 ground at any alpha (0.5 and 0.8 differ by 0.03:1). What it actually does is collapse the contrast of the CONTENT behind it — in light the ground drops to #7c7c7c under dark text, in dark the text drops to #494949 over an unmoved ground. Same result, opposite mechanism, which is why the two alphas differ. Nothing else in the system is translucent; do not reach for it as a tint. */
+  --shadow-overlay: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.12); /* Menus, dropdowns, popovers, tooltips and autocompletes — anything that draws over content without a backdrop. Always paired with a 1px `border` on `surface-raised`; the shadow is lift, the border is the edge. Heavier in dark because a black shadow barely reads on a near-black ground. Not for cards, headers or anything that sits in the page. */
+}
+[data-theme="dark"] {
+  --surface: #111111;
+  --surface-raised: #1c1c1c;
+  --surface-sunken: #050505;
+  --border: #3a3a3a;
+  --ink: #f5f5f5;
+  --ink-muted: #8f8f8f;
+  --accent: #dd92a3;
+  --accent-soft: #372a2d;
+  --on-accent: #141414;
+  --danger: #f4665a;
+  --backdrop: rgba(0, 0, 0, 0.7);
+  --shadow-overlay: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+:root {
+  --space-1: 4px; /* Icon-to-text nudges, badge inset, focus offset. */
+  --space-2: 8px; /* Gap inside a control: button icon gap, checkbox to label. */
+  --space-3: 12px; /* Input horizontal padding, badge horizontal padding. */
+  --space-4: 16px; /* Default gap between related elements; page gutter on mobile. */
+  --space-5: 24px; /* Card padding; gap between fields in a form. */
+  --space-6: 32px; /* Gap between cards; page gutter from `bp-desktop`. */
+  --space-7: 48px; /* Gap between sections on mobile; page gutter at `bp-desktop-lg`. */
+  --space-8: 64px; /* Gap between sections from `bp-desktop`. */
+  --space-9: 96px; /* Page top and bottom padding on desktop; the largest step there is. */
+  --radius-sm: 4px; /* Checkbox, swatch, inline code, small chips. */
+  --radius-md: 8px; /* Buttons, inputs, selects, menus — every interactive control. */
+  --radius-lg: 16px; /* Cards, panels, sheets, modals. */
+  --radius-full: 9999px; /* Badges, pills, avatars, toggle track. */
+  --bp-desktop: 48rem; /* 768px. Small desktops and landscape tablets: gutters go to `space-6`, `h1` to 40px, content caps at 60rem. */
+  --bp-desktop-lg: 75rem; /* 1200px. Large desktops: gutters go to `space-7`, `h1` to 48px, content caps at 72rem. */
+  --font-sans: "Switzer", system-ui, -apple-system, sans-serif;
+  --font-mono: "Commit Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --text-h1: 600 32px/36px var(--font-sans); /* Page title, one per page. Grows to 40px at `bp-desktop` and 48px at `bp-desktop-lg`. */
+  --text-h2: 600 24px/30px var(--font-sans); /* Section heading. Grows to 28px at `bp-desktop`. */
+  --text-h3: 600 18px/24px var(--font-sans); /* Card and subsection heading. Fixed at every width. */
+  --text-body-lg: 400 18px/28px var(--font-sans); /* Intros and standfirsts. One paragraph, not a page of them. */
+  --text-body: 400 16px/24px var(--font-sans); /* Default for all running text and inputs. Set it on `body` and let it inherit. */
+  --text-body-sm: 400 14px/20px var(--font-sans); /* Dense text: table cells, hints, button labels, secondary copy. */
+  --text-label: 600 12px/16px var(--font-sans); /* Field labels, badges, table headers, meta. Set in sentence case — no `text-transform`. In `ink-muted` on `surface`, `surface-raised` or `surface-sunken`; in `accent` on `accent-soft`. */
+  --text-code: 400 14px/20px var(--font-mono); /* Code blocks, inline code, and any value read as data: dates, times, IDs, version strings, hashes, money and figures in a table. Matches `body-sm`, so it drops into a table cell or a hint without disturbing the row. */
+  --text-code-sm: 400 12px/16px var(--font-mono); /* Dense meta in mono: timestamps, short IDs, build numbers beside a `label`. Matches `label`, so the two sit on one line without a baseline shift. */
+}
+.h1 {
+  font-family: var(--font-sans);
+  font-size: 32px;
+  line-height: 36px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.h2 {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.h3 {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.body-lg {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.body-sm {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.code {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.code-sm {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("fonts/Switzer-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("fonts/Switzer-VariableItalic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Commit Mono";
+  src: url("fonts/CommitMono.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}

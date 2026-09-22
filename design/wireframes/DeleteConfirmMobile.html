@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete book confirm — mobile</title>
+<style>
+@font-face{font-family:"Switzer";src:url(../system/fonts/Switzer-Variable.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+body{margin:0;display:flex;align-items:flex-start;justify-content:center;font-family:"Switzer",system-ui,-apple-system,sans-serif;background:#f7f7f7;color:#171717}
+button,input,textarea{font-family:inherit}
+a{color:#9b4a60}a:hover{color:color-mix(in oklab,#9b4a60 88%,#171717)}
+[data-hover="ghost"]:hover{background:color-mix(in oklab,#ececec 94%,#171717);color:#171717}
+[data-hover="secondary"]:hover{background:color-mix(in oklab,#ffffff 93%,#171717);border-color:color-mix(in oklab,#d4d4d4 80%,#171717)}
+[data-hover="danger"]:hover{background:color-mix(in oklab,#ba1a1a 14%,#ffffff);color:color-mix(in oklab,#ba1a1a 88%,#171717);border-color:color-mix(in oklab,#ba1a1a 88%,#171717)}
+</style>
+</head>
+<body>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding: 16px; overflow: hidden; background: rgba(0, 0, 0, 0.5);">
+
+<div style="width: 100%; box-sizing: border-box; background: #ffffff; border: 1px solid #d4d4d4; border-radius: 16px; overflow: hidden; color: #171717;">
+
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 8px 8px 16px; border-bottom: 1px solid #d4d4d4;">
+<h2 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em;">Delete book?</h2>
+<button type="button" aria-label="Close" data-hover="ghost" style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; border: none; border-radius: 8px; color: #171717; cursor: pointer;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6l-12 12"></path><path d="M6 6l12 12"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 16px;">
+<p style="margin: 0; font-size: 16px; line-height: 24px;"><strong style="font-weight: 600;">Piranesi</strong> by Susanna Clarke will be removed from your shelf, along with its notes.</p>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #676767;">This cannot be undone.</p>
+</div>
+
+<footer style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-top: 1px solid #d4d4d4;">
+<button type="button" data-hover="danger" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 16px; background: transparent; border: 1px solid #ba1a1a; border-radius: 8px; color: #ba1a1a; font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer;">Delete book</button>
+<button type="button" data-hover="secondary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 16px; background: #ffffff; border: 1px solid #d4d4d4; border-radius: 8px; color: #171717; font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer;">Cancel</button>
+</footer>
+
+</div>
+</div>
+</body>
+</html>

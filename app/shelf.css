@@ -1,0 +1,885 @@
+/* Shelf — app layout.
+ *
+ * Everything visual comes from design/system. This file holds composition
+ * only: the app grid, the library rows, the modal frame. There is not a
+ * single colour literal here, and there must never be one — every colour is
+ * var(--token). No transitions either; bundle.css already enforces that.
+ *
+ * Mobile first, one breakpoint at bp-desktop (48rem / 768px), per the system.
+ */
+
+/* Now that the page itself is the scroller, the scrollbar's 15px has to be
+ * reserved permanently. Without this the gutter appears and disappears —
+ * when a modal locks the body, and every time a filter takes the list under
+ * one screenful — and the whole layout jumps sideways each time. */
+html { scrollbar-gutter: stable; }
+
+/* ─── Utilities ─────────────────────────────────────────────────────────── */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* An icon-only .btn. Width only — the height stays the component's own, so a
+ * 40px icon button lines up with a 40px text button. 44px on a phone, which is
+ * what spec.md asks for of every touch target.
+ *
+ * Chrome is drawn in `ink` and only takes the accent under the pointer.
+ * btn--ghost's own colour is `accent` at rest, which puts the one hue on every
+ * icon in the topbar at once and leaves hover with nothing to say. */
+.icon-btn {
+  width: 44px;
+  padding-inline: 0;
+  color: var(--ink);
+}
+
+.icon-btn:hover { color: var(--accent); }
+.icon-btn:active { color: var(--accent-active); }
+
+.icon-btn svg,
+.btn svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* An icon button holding a menu open keeps its own hover ground while the
+ * menu is up. btn--ghost is the one control the system lets hover into
+ * accent-soft, precisely because it has no selected state to be confused
+ * with — so there is no ambiguity in reusing it here. */
+.btn--ghost[aria-expanded="true"] { background: var(--accent-soft); }
+.icon-btn[aria-expanded="true"] { color: var(--accent); }
+
+/* ─── App shell ─────────────────────────────────────────────────────────
+ * One grid. The wordmark is a single <h1> that moves between the phone's
+ * topbar and the desktop sidebar by changing areas, not by being written
+ * twice. */
+
+.app {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 64px auto minmax(0, 1fr);
+  grid-template-areas:
+    "brand   bar"
+    "chips   chips"
+    "content content";
+}
+
+.app__brand {
+  grid-area: brand;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-inline: var(--space-4);
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.app__wordmark {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.app__bar {
+  grid-area: bar;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+  padding-inline: var(--space-4);
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.app__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* The theme toggle is the system's own component and keeps all of its
+ * behaviour — bundle.js still owns the glyphs, the cycle and the aria-label.
+ * Only its chrome changes: in this topbar it stands in a row of icon buttons,
+ * so it drops its pill (raised ground, hairline, radius-full) for their
+ * ground and their radius-md corner. Sizing and colour come from .icon-btn,
+ * which it now carries. */
+.app__actions .theme-toggle {
+  background: transparent;
+  border-color: transparent;
+  border-radius: var(--radius-md);
+}
+
+.app__actions .theme-toggle:hover {
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+
+.app__actions .theme-toggle svg { width: 20px; height: 20px; }
+
+.app__rule {
+  width: 1px;
+  height: 24px;
+  margin-inline: var(--space-2);
+  background: var(--border);
+}
+
+/* The phone's search field and its Cancel exist only while search is open;
+ * the desktop's search field is always there and the opener never is. */
+.app__search,
+.app__search-cancel { display: none; }
+
+.app[data-search="open"] .app__brand,
+.app[data-search="open"] .app__actions { display: none; }
+
+.app[data-search="open"] .app__bar {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  gap: var(--space-2);
+}
+
+.app[data-search="open"] .app__search,
+.app[data-search="open"] .app__search-cancel { display: block; }
+
+.app__search { flex: 1 1 auto; min-width: 0; position: relative; }
+.app__search-cancel { flex: none; }
+
+/* The native type="search" clear control renders in the browser's own accent —
+ * a blue that is in no token — so it is suppressed and replaced with the
+ * system's close glyph, which inherits currentColor like every other icon.
+ * The button is only in the DOM while there is something to clear. */
+.search__input { padding-right: var(--space-8); }
+
+.search__input::-webkit-search-cancel-button,
+.search__input::-webkit-search-decoration { appearance: none; display: none; }
+
+.search__clear {
+  position: absolute;
+  top: 50%;
+  right: var(--space-1);
+  translate: 0 -50%;
+  width: 44px;
+  padding-inline: 0;
+}
+
+.search__clear svg { width: 16px; height: 16px; }
+
+/* .btn sets a display, which outranks the UA rule for [hidden]. */
+.search__clear[hidden] { display: none; }
+
+/* The sidebar is desktop only; the pills are its phone form. */
+.app__side { display: none; }
+
+.app__chips {
+  grid-area: chips;
+  min-width: 0;
+  padding: var(--space-4) 0 0;
+}
+
+.app__content {
+  grid-area: content;
+  min-width: 0;
+  padding: var(--space-4);
+  /* Clear of both the floating Add book and the home indicator. */
+  padding-bottom: calc(var(--space-safe-bottom) + var(--space-8));
+}
+
+/* ─── Filter pills (phone) ────────────────────────────────────────────────
+ * badge badge--neutral selectable + aria-pressed, per components/Badge.md.
+ * The system's badge is 24px; a filter chip is also a touch target, so the
+ * height is raised to the 44px spec.md asks for. Nothing else is touched —
+ * the ground, the text colour and the selected state are all the component's. */
+
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-inline: var(--space-4);
+}
+
+.chips::-webkit-scrollbar { display: none; }
+
+.chips .badge {
+  min-height: 44px;
+  flex: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+/* ─── Filter list (desktop sidebar) ─────────────────────────────────────── */
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.nav__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.nav__heading {
+  margin: 0 0 var(--space-1);
+  padding-inline: var(--space-3);
+  color: var(--ink-muted);
+}
+
+.nav__rule {
+  height: 1px;
+  background: var(--border);
+}
+
+/* .selectable carries hover and selected; this only gives it a shape. */
+.nav__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 44px;
+  padding-inline: var(--space-3);
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nav__item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.nav__count { color: var(--ink-muted); }
+
+/* Selected takes the whole row into accent, count included. */
+.nav__item[aria-pressed="true"] .nav__count { color: inherit; }
+
+/* ─── Floating Add book (phone) ─────────────────────────────────────────── */
+
+.fab {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-safe-bottom);
+  z-index: 10;
+  width: 56px;
+  height: 56px;
+  min-height: 56px;
+  padding: 0;
+  border-radius: var(--radius-full);
+}
+
+.fab svg { width: 24px; height: 24px; }
+
+/* ─── Library ───────────────────────────────────────────────────────────── */
+
+.list {
+  padding: 0;
+  overflow: hidden;
+}
+
+.list__head {
+  display: none;
+  background: var(--surface-sunken);
+  border-bottom: 1px solid var(--border);
+}
+
+.list__head > span {
+  padding: var(--space-3) var(--space-4);
+  color: var(--ink-muted);
+}
+
+/* One row, one click target — including the heart, which is an indicator and
+ * never a control. spec.md is explicit that this is why the row is a button
+ * and the library is not a <table>. */
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-sans);
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:last-child { border-bottom: 0; }
+
+/* A row sits on the raised ground of the list, so it darkens its own fill.
+ * It has no selected state, so surface-sunken-hover — which the system keeps
+ * for things that also have one — would be the wrong signal here. */
+.row:hover { background: var(--surface-hover); }
+
+.row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.row__status { display: flex; }
+.row__status .badge { min-width: var(--space-7); justify-content: center; }
+
+/* The mobile badge is the desktop one shortened to fit a 390px row. It is not
+ * a different status: both carry the full label as accessible text. */
+.row__badge-long { display: none; }
+
+.row__main { min-width: 0; }
+
+.row__title {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.row__meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  min-width: 0;
+  color: var(--ink-muted);
+}
+
+.row__author {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.row__date {
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.row--undated .row__sep,
+.row--undated .row__date { display: none; }
+
+.row__fav {
+  display: flex;
+  justify-content: flex-end;
+  width: 24px;
+  color: var(--accent);
+}
+
+.row__fav svg { width: 16px; height: 16px; }
+
+/* ─── Empty state ───────────────────────────────────────────────────────── */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-7) var(--space-5);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.empty__title { margin: 0; }
+.empty__body { margin: 0; color: var(--ink-muted); }
+
+/* ─── Sort menu ─────────────────────────────────────────────────────────── */
+
+.menu {
+  position: fixed;
+  z-index: 40;
+  width: 208px;
+  padding: var(--space-1);
+  display: flex;
+  flex-direction: column;
+}
+
+.menu__heading {
+  margin: 0;
+  padding: var(--space-2) var(--space-3) var(--space-1);
+  color: var(--ink-muted);
+}
+
+.menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 44px;
+  padding-inline: var(--space-3);
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu__item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.menu__item svg { width: 16px; height: 16px; flex: none; }
+
+/* ─── Modals ────────────────────────────────────────────────────────────
+ * A modal panel is an ordinary .card and takes NO shadow — the scrim is
+ * already doing that work. The card's own padding is zeroed so the header
+ * and footer rules can bleed to its edges; the parts carry it instead.
+ *
+ * On a phone, forms and details are bottom sheets and confirmations stay
+ * centred dialogs (.modal--dialog), because a confirmation is short and
+ * should not feel swipeable. */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 92dvh;
+  padding: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+}
+
+.modal--dialog {
+  align-items: center;
+  padding: var(--space-4);
+}
+
+.modal--dialog .modal__panel {
+  max-height: calc(100dvh - var(--space-6));
+  border-radius: var(--radius-lg);
+}
+
+.modal__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.modal__title { margin: 0; }
+
+.modal__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-4);
+}
+
+.modal__foot {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-safe-bottom);
+}
+
+/* A confirmation keeps its rules: it is a dialog at every width. */
+.modal--dialog .modal__foot {
+  padding: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Modal contents ────────────────────────────────────────────────────── */
+
+.detail__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.detail__title { margin: 0; }
+.detail__author { margin: 0; color: var(--ink-muted); }
+.detail__badges { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.detail__badges svg { width: 12px; height: 12px; }
+
+.detail__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.detail__label { color: var(--ink-muted); }
+
+/* A read-only panel is a sunken well, and a well is defined by its fill.
+ * No border — `border` is only ~1.3:1 against surface-sunken. */
+.panel {
+  padding: var(--space-3);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+}
+
+.panel--row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.panel--row svg { width: 20px; height: 20px; flex: none; color: var(--ink-muted); }
+
+.panel--row > :first-child {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.panel--notes { white-space: pre-wrap; }
+
+/* ─── Form ──────────────────────────────────────────────────────────────── */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldset__legend {
+  padding: 0;
+  color: var(--ink-muted);
+}
+
+.radios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+/* The date field is absent, not empty, when the status is not Read — so it
+ * must not leave the form's gap behind it either. */
+.form__date:empty { display: none; }
+
+/* Favourite, as the wireframes draw it: the label at the start of the row and
+ * the switch at the end, full width. Only the direction and the width change —
+ * the whole <label> is still the hit target, which is the component's rule.
+ * The 24px track is the body line-height, so it centres with no nudge. */
+.form__switch {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* ─── Cloud settings ────────────────────────────────────────────────────── */
+
+.secret { position: relative; }
+
+.secret .field-input { padding-right: var(--space-8); }
+
+/* The reveal button sits inside the field's border. 44px wide on a phone —
+ * spec.md is explicit that the wireframe's 32 is too small for a thumb — but
+ * it keeps .btn's own 40px height, because the field it lives in is 42px and
+ * a 44px control would push its hover ground out through the border. The
+ * thumb gets 44×40 either way. */
+.secret__eye {
+  position: absolute;
+  top: 50%;
+  right: var(--space-1);
+  translate: 0 -50%;
+  width: 44px;
+  padding-inline: 0;
+}
+
+/* The modal body is a flex column at space-5; the browser's own paragraph
+ * margin lands on top of that gap and pushes the first field out of rhythm. */
+.cloud__intro { margin-block: 0; }
+
+.cloud__status { color: var(--ink); }
+.cloud__status[data-tone="muted"] { color: var(--ink-muted); }
+
+.confirm__body { margin: 0; }
+.confirm__note { margin: 0; color: var(--ink-muted); }
+
+/* ─── Desktop ───────────────────────────────────────────────────────────── */
+
+@media (min-width: 48rem) {
+
+  .icon-btn { width: 40px; }
+
+  /* The page is the only thing that scrolls. Giving the library its own
+   * overflow container puts a second scrollbar on screen and makes the wheel
+   * dead everywhere but over the table itself — so the grid grows with the
+   * list and the chrome is pinned with `sticky` instead. */
+  .app {
+    min-height: 100dvh;
+    grid-template-columns: 264px minmax(0, 1fr);
+    grid-template-rows: 64px auto;
+    grid-template-areas:
+      "brand bar"
+      "side  content";
+  }
+
+  .app__brand,
+  .app__bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .app__brand {
+    padding-inline: var(--space-5);
+    border-bottom: 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .app__bar {
+    justify-content: space-between;
+    padding-inline: var(--space-5);
+  }
+
+  .app__search {
+    display: block;
+    width: 360px;
+    flex: 0 1 360px;
+  }
+
+  /* Same treatment as the token field's reveal: 32px on a pointer, 44 on a
+   * thumb — spec.md's rule for controls that sit inside a field's border. */
+  .search__clear {
+    width: 32px;
+    min-height: 32px;
+  }
+
+  .search__input { padding-right: var(--space-7); }
+
+  .app__search-open,
+  .app__search-cancel { display: none; }
+
+  /* Search-open is a phone state. If the viewport grows while it is on, the
+   * desktop bar takes over and the state stops meaning anything. */
+  .app[data-search="open"] .app__brand,
+  .app[data-search="open"] .app__actions { display: flex; }
+
+  .app[data-search="open"] .app__bar {
+    grid-column: 2;
+    grid-row: 1;
+    gap: var(--space-4);
+  }
+
+  .app[data-search="open"] .app__search-cancel { display: none; }
+
+  /* Two parts, because the sidebar has two jobs. The outer one fills the whole
+   * column so the raised ground and its hairline run the full height of the
+   * page however long the list gets; the inner one is a viewport-tall sticky
+   * panel, which is what keeps the filters and Add book in place while the
+   * page scrolls past. */
+  .app__side {
+    grid-area: side;
+    display: block;
+    min-height: calc(100dvh - 64px);
+    background: var(--surface-raised);
+    border-right: 1px solid var(--border);
+  }
+
+  .app__side-inner {
+    position: sticky;
+    top: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    height: calc(100dvh - 64px);
+    padding: var(--space-5);
+    overflow-y: auto;
+  }
+
+  .app__add { margin-top: auto; }
+
+  .app__chips,
+  .fab { display: none; }
+
+  .app__content {
+    padding: var(--space-5);
+    padding-bottom: var(--space-5);
+  }
+
+  /* The five-column table. .row__main and .row__meta dissolve so the title,
+   * author and date become columns of the row's own grid.
+   *
+   * The tracks are declared once on the list and each row takes them through
+   * `subgrid`, so every row measures against the same columns — a row is still
+   * its own <button> and its own grid, it just stops inventing widths.
+   *
+   * Every track but the badge is content-floored and free to shrink, so the
+   * table gives ground in the right order as the window narrows:
+   *
+   *   favourite  `auto`                      always just the heart.
+   *   date read  `minmax(min-content, .5fr)` roomy while there is room, which
+   *                                          is what holds the date clear of
+   *                                          the heart; it takes a share of
+   *                                          the spare width, and once that
+   *                                          share drops below the width of a
+   *                                          date it freezes on the date and
+   *                                          the two sit together.
+   *   title      1.6fr, author 1fr           the rest, in the artboard's
+   *                                          proportion. A fixed 260px author
+   *                                          column, as the wireframe draws
+   *                                          it, eats the whole title as the
+   *                                          window nears the breakpoint; the
+   *                                          system's answer is minmax(), not
+   *                                          a third breakpoint.
+   *
+   * The date stays left-aligned in its track — that is what leaves the gap.
+   * Right-aligning it would pin it to the track's right edge, flush against
+   * the heart at every width, however wide the track grew. */
+  .list {
+    display: grid;
+    grid-template-columns:
+      120px minmax(0, 1.6fr) minmax(0, 1fr) minmax(min-content, 0.5fr) auto;
+  }
+
+  .list__head,
+  .row {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    align-items: center;
+    gap: 0;
+  }
+
+  .row { padding: 0; }
+
+  .row__main,
+  .row__meta { display: contents; }
+
+  .row__status { padding: var(--space-3) var(--space-2) var(--space-3) var(--space-4); }
+  .row__status .badge { min-width: 0; }
+
+  .row__badge-long { display: inline; }
+  .row__badge-short,
+  .row__sep { display: none; }
+
+  .row__title {
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-2);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .row__author {
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    color: var(--ink-muted);
+  }
+
+  .row__date {
+    padding: var(--space-3) var(--space-4);
+    color: var(--ink);
+  }
+
+  /* A read book with no date is still a date cell: it shows a dash rather
+   * than collapsing the column. */
+  .row--undated .row__date {
+    display: block;
+    color: var(--ink-muted);
+  }
+
+  .row__fav {
+    width: auto;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .modal {
+    align-items: center;
+    padding: var(--space-6);
+  }
+
+  .modal__panel {
+    width: 520px;
+    max-width: 100%;
+    max-height: calc(100dvh - var(--space-8));
+    border-radius: var(--radius-lg);
+  }
+
+  .modal__body { padding: var(--space-5); }
+
+  .modal__foot {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--border);
+  }
+
+  .modal__foot > [data-role="delete"] {
+    margin-top: 0;
+    margin-right: auto;
+  }
+
+  .detail__head {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .detail__names { min-width: 0; }
+  .detail__badges { flex: none; }
+
+  .secret__eye {
+    width: 32px;
+    min-height: 32px;
+  }
+
+  .secret .field-input { padding-right: var(--space-7); }
+}
