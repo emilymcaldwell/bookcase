@@ -1,0 +1,124 @@
+/* Design Basics — tokens
+ *
+ * Every colour is one light-dark() pair, resolved against color-scheme.
+ * No [data-theme] blocks and no prefers-color-scheme queries.
+ *   Follow the system:  leave color-scheme: light dark (the default below).
+ *   Force a theme:      set color-scheme: light | dark on <html>, or on any
+ *                       element to pin that section.
+ * No transitions or animations anywhere in the system.
+ */
+
+@font-face {
+  font-family: "Switzer";
+  src: url("fonts/Switzer-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Switzer";
+  src: url("fonts/Switzer-VariableItalic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Commit Mono's default instance is 200; the weight range makes 400 render as 400. */
+@font-face {
+  font-family: "Commit Mono";
+  src: url("fonts/CommitMono.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light dark;
+
+  /* Colour: light-dark(light, dark) */
+  --surface:        light-dark(#f7f7f7, #111111);
+  --surface-raised: light-dark(#ffffff, #1c1c1c);
+  --surface-sunken: light-dark(#ececec, #222222);
+  --border:         light-dark(#d4d4d4, #3a3a3a);
+  --ink:            light-dark(#171717, #f5f5f5);
+  --ink-muted:      light-dark(#676767, #8f8f8f);
+  --accent:         light-dark(#9b4a60, #dd92a3);
+  --accent-soft:    light-dark(#f2e5e7, #372a2d);
+  --on-accent:      light-dark(#ffffff, #141414);
+  --danger:         light-dark(#ba1a1a, #f4665a);
+  --danger-soft:    light-dark(#fae2de, #3d2420);
+  --backdrop:       light-dark(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+
+  /* Optional colours: the rainbow. Not part of the base palette, and not
+   * used unless an app opts in for categorical status (see README, "Optional
+   * colours"). Each hue is a text tone paired with a soft tint, like accent
+   * and accent-soft, and passes 4.5:1 on its own tint and on every surface. */
+  --red:            light-dark(#b42318, #f28b82);
+  --red-soft:       light-dark(#fde3e0, #3d221f);
+  --orange:         light-dark(#9a4c00, #f0a45e);
+  --orange-soft:    light-dark(#fbe6d3, #3a2916);
+  --yellow:         light-dark(#715c00, #e0c449);
+  --yellow-soft:    light-dark(#f6efc4, #33301a);
+  --green:          light-dark(#23693a, #7fcb8f);
+  --green-soft:     light-dark(#ddf0df, #1d3223);
+  --blue:           light-dark(#1d5db0, #8ab8f2);
+  --blue-soft:      light-dark(#dce8f9, #1b2a3d);
+  --indigo:         light-dark(#4b48b0, #aaa7f2);
+  --indigo-soft:    light-dark(#e5e4f8, #26263f);
+  --violet:         light-dark(#7b3ba0, #cf9ee8);
+  --violet-soft:    light-dark(#f0e2f7, #33243c);
+
+  /* Shadow: one, for menus and popovers. light-dark() wraps each layer's
+   * colour, because it can't wrap a multi-layer shadow as a whole. */
+  --shadow-overlay:
+    0 1px 2px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4)),
+    0 8px 24px light-dark(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.6));
+
+  /* Spacing: 4px grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Type */
+  --font-sans: "Switzer", system-ui, -apple-system, sans-serif;
+  --font-mono: "Commit Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Breakpoints: custom properties can't be used inside @media, so write these
+ * two values directly. Mobile first; these are the only two.
+ *   @media (min-width: 48rem) { ... }   bp-desktop, 768px
+ *   @media (min-width: 75rem) { ... }   bp-desktop-lg, 1200px
+ */
+
+/* Text styles */
+.h1      { font: 600 32px/36px var(--font-sans); letter-spacing: -0.02em; }
+.h2      { font: 600 24px/30px var(--font-sans); letter-spacing: -0.015em; }
+.h3      { font: 600 18px/24px var(--font-sans); letter-spacing: -0.01em; }
+.body-lg { font: 400 18px/28px var(--font-sans); }
+.body    { font: 400 16px/24px var(--font-sans); }
+.body-sm { font: 400 14px/20px var(--font-sans); }
+.label   { font: 600 12px/16px var(--font-sans); letter-spacing: 0.02em; }
+.code    { font: 400 14px/20px var(--font-mono); }
+.code-sm { font: 400 12px/16px var(--font-mono); }
+
+@media (min-width: 48rem) {
+  .h1 { font-size: 40px; line-height: 44px; }
+  .h2 { font-size: 28px; line-height: 34px; }
+}
+
+@media (min-width: 75rem) {
+  .h1 { font-size: 48px; line-height: 52px; }
+}

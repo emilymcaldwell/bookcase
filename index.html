@@ -2,17 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<!-- viewport-fit=cover so env(safe-area-inset-bottom) reports, which --space-safe-bottom reads. -->
+<!-- viewport-fit=cover so env(safe-area-inset-bottom) reports on phones with a home indicator. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bookcase</title>
-<script>try{var s=localStorage.getItem('ds-scheme');if(s==='light'||s==='dark')document.documentElement.setAttribute('data-theme',s)}catch(e){}</script>
-<link rel="stylesheet" href="design/system/tokens.css">
-<link rel="stylesheet" href="design/system/components/bundle.css">
+<!-- Apply a saved forced theme before any stylesheet loads, so the page never flashes. -->
+<script>try{var t=localStorage.getItem('shelf.theme');if(t==='light'||t==='dark')document.documentElement.style.colorScheme=t}catch(e){}</script>
+<link rel="stylesheet" href="../design/tokens.css">
 <link rel="stylesheet" href="app/shelf.css">
-<script src="design/system/components/bundle.js" defer></script>
 <script src="app/shelf.js" defer></script>
 </head>
-<body class="ds-app">
+<body>
 
 <div class="app" id="app">
 
@@ -29,21 +28,22 @@
         type="search"
         autocomplete="off"
         placeholder="Search by title or author">
-      <button class="btn btn--ghost icon-btn search__clear" type="button"
+      <button class="btn icon-btn search__clear" type="button"
               data-action="search-clear" data-icon="close" aria-label="Clear search" hidden></button>
     </div>
 
-    <div class="app__actions">
-      <button class="btn btn--ghost icon-btn app__search-open" type="button"
+    <nav class="app__actions" aria-label="Library tools">
+      <button class="btn icon-btn app__search-open" type="button"
               data-action="search-open" data-icon="search" aria-label="Search"></button>
-      <button class="btn btn--ghost icon-btn" type="button" id="sort-button"
+      <button class="btn icon-btn" type="button" id="sort-button"
               data-action="sort" data-icon="sort" aria-label="Sort"
               aria-haspopup="true" aria-expanded="false"></button>
-      <button class="btn btn--ghost icon-btn" type="button"
+      <button class="btn icon-btn" type="button"
               data-action="cloud" data-icon="cloud" aria-label="Cloud settings"></button>
       <span class="app__rule" aria-hidden="true"></span>
-      <button class="theme-toggle theme-toggle--icon icon-btn" type="button" data-ds-theme-toggle></button>
-    </div>
+      <button class="btn icon-btn theme-toggle" type="button"
+              id="theme-toggle" data-action="theme"></button>
+    </nav>
 
     <button class="btn btn--ghost app__search-cancel" type="button" data-action="search-cancel">Cancel</button>
   </div>

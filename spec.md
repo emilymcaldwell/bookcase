@@ -3,7 +3,8 @@
 The wireframes show one frozen moment per screen. This file holds the rules
 they cannot show: what a thing does, when it exists, and what happens next.
 Where this file and a wireframe disagree, this file wins. Where this file and
-`design/system/` disagree, the design system wins.
+the design system — `design/README.md` at the repository root, with its
+`tokens.css`, fonts and icons — disagree, the design system wins.
 
 ## The data
 
@@ -14,8 +15,8 @@ One book is:
 | `id`       | string                                      | stable, generated on add                |
 | `title`    | string                                      | required                                |
 | `author`   | string                                      | required                                |
-| `status`   | `reading` \| `tbr` \| `read` \| `dropped`   | required, exactly one                   |
-| `dateRead` | `YYYY-MM-DD` \| null                        | **only** when `status === 'read'`       |
+| `status`   | `CR` \| `TBR` \| `R` \| `DNF`               | required, exactly one                   |
+| `dateRead` | `YYYY-MM-DD` \| null                        | **only** when `status === 'R'`          |
 | `favourite`| boolean                                     | default false                           |
 | `notes`    | string                                      | free text, may be empty                 |
 | `addedAt`  | ISO timestamp                               | never shown, used by the default sort   |
@@ -28,17 +29,35 @@ there" — the whole point of the app is that it stays this small.
 
 One status, four values, three different renderings:
 
-| value     | full label | desktop badge | mobile badge |
-| --------- | ---------- | ------------- | ------------ |
-| `reading` | Reading    | Reading       | CR           |
-| `tbr`     | To read    | To read       | TBR          |
-| `read`    | Read       | Read          | R            |
-| `dropped` | Dropped    | Dropped       | DNF          |
+| value | full label | desktop badge | mobile badge |
+| ----- | ---------- | ------------- | ------------ |
+| `CR`  | Reading    | Reading       | CR           |
+| `TBR` | To read    | To read       | TBR          |
+| `R`   | Read       | Read          | R            |
+| `DNF` | Dropped    | Dropped       | DNF          |
 
-The full label is used in forms, filters and the details modal. The badge is
-used in the library row. The mobile badge is the desktop badge shortened to fit
-a 390px row — it is not a different status, and it carries the full label as
-accessible text.
+The stored value is the mobile badge. The full label is used in forms, filters
+and the details modal. The badge is used in the library row. The mobile badge
+is the desktop badge shortened to fit a 390px row — it is not a different
+status, and it carries the full label as accessible text. There are no older
+spellings and no migration: a file using anything else is not a shelf this app
+wrote, and an unrecognised value falls back to `TBR`.
+
+The app opts into the design system's optional colours, so each status has a
+hue, on its own soft tint and never mixed:
+
+| value | badge colours             |
+| ----- | ------------------------- |
+| `CR`  | `blue` on `blue-soft`     |
+| `TBR` | `violet` on `violet-soft` |
+| `R`   | `green` on `green-soft`   |
+| `DNF` | `red` on `red-soft`       |
+
+The word still carries the status; the colour only makes the four easier to
+tell apart in a long list. Dropped is red on purpose: it reads as "stop", and
+that is the point of the status. It is the category `red`, not `danger` —
+`danger` stays on the one button that deletes a book, and nothing else in the
+app uses these hues. The filter chips stay neutral badges.
 
 `dateRead` and `status` are coupled: the date field appears in a form only when
 Read is selected, and disappears (and clears) when the status changes away from
@@ -76,14 +95,16 @@ Fifteen artboards, seven states. Desktop is drawn at 1440×900, mobile at
 ### Desktop
 
 Sidebar (full height, fixed): the app title at the top, then a single-select
-filter list — All books, Reading, To read, Read, Dropped — then a divider, then
-Favourites. Favourites is part of the same single-select list, not a second
+filter list — All books, Reading, To read, Read, Dropped — at 600 with a
+regular-weight count, then a divider, then Favourites. Favourites is part of the same single-select list, not a second
 axis: choosing it replaces the status filter rather than narrowing it. Add book
 sits at the bottom of the sidebar as a primary button.
 
 Topbar: search on the left (`Search by title or author`, filters as you type,
 matches title and author, case-insensitive, no submit); icon buttons on the
-right — sort, cloud, theme toggle. Sort opens a menu with Date added (default),
+right — sort, cloud, theme toggle — in `ink`, as icon buttons, not ghost
+buttons; the sort button takes `accent-soft` and `accent` only while its
+menu is open. The clear cross inside the search field is the same. Sort opens a menu with Date added (default),
 Date read, Title, Author, Status; the active option's icon and label take
 `accent`. Status sorts in the order the four are listed everywhere else —
 Reading, To read, Read, Dropped — not alphabetically, and falls back to date
@@ -107,9 +128,10 @@ field and a Cancel button (`MainMobileSearch`), and Cancel restores the bar and
 clears the query.
 
 The sidebar filters become one row of pills that scrolls sideways, in the same
-order, with the same single-select behaviour. Per `components/Badge.md` these
-are `badge badge--neutral selectable` with `aria-pressed` — the wireframe draws
-them as bordered white pills, which is wrong; follow the system.
+order, with the same single-select behaviour. These are neutral badges used as
+filter chips — `badge badge--neutral selectable` with `aria-pressed`: hover is
+a neutral step toward `ink`, selected is `accent-soft` with `accent` text. The
+wireframe draws them as bordered white pills, which is wrong; follow the system.
 
 Each row is badge / (title stacked over author · date read) / heart, and the
 whole row is the tap target. Add book becomes a floating button, bottom right.
@@ -204,27 +226,31 @@ returns to the previous contents with all form state intact.
   after it is accepted.
 - Mobile stacks the two buttons full width, confirming action on top.
 
-**Open question, deliberately left open:** per `components/Button.md`, now that
-both destructive paths confirm, the *openers* (Delete book in the details modal
-and in the edit form) arguably should drop to secondary or ghost, with
-`btn--danger` reserved for the button that actually deletes. The wireframes
-still draw both as danger. Ask before changing it.
+**Resolved:** the system says the danger style is only for the button that
+actually deletes, and that the button which *opens* a confirmation is an
+ordinary secondary or ghost button. So the openers (Delete book in the details
+modal and in the edit form) are secondary, and `btn--danger` appears once, on
+the Delete book inside the confirmation. The wireframes still draw both as
+danger; the system wins.
 
 ## Theme
 
-Light, dark and system, via the design system's own theme toggle — see
-`components/ThemeToggle.md`. The default is system. The inline scheme snippet
-in `CLAUDE.md` must run before any stylesheet or the wrong scheme flashes.
-Nothing in the app should read colours from anywhere but tokens, so dark mode
-should need no per-screen work; if it does, that is a bug in the markup.
+Light, dark and system, via the theme switcher the design system describes: an
+icon button at the end of the header, styled like the other bar icons with no
+text and no border, whose icon shows the state (System, Light or Dark) and
+whose accessible label names that state and what the next press does, cycling
+System → the opposite of the OS → System.
+The default is system. A forced choice is `color-scheme` on `<html>`, saved in
+`localStorage` under `shelf.theme` and re-applied by the inline script at the
+top of `<head>`, before any stylesheet, or the wrong scheme flashes.
 
-## Gaps in the design system
+Nothing in the app reads colours from anywhere but tokens — hover and pressed
+states are a token mixed a step toward `ink` — so dark mode needs no per-screen
+work; if it does, that is a bug in the markup.
 
-Two values were improvised in the wireframes and should be added to the system
-rather than inlined:
+## Values that are not tokens
 
-- the bottom padding that keeps a pinned mobile footer clear of the home
-  indicator (drawn as `space-7`);
-- a dim level for an inert region behind an overlay.
-
-If you need any other value that isn't a token, stop and ask.
+The system has no token for the padding that keeps a pinned mobile footer or a
+floating button clear of the home indicator. The app adds
+`env(safe-area-inset-bottom)` to the nearest spacing step there, and nowhere
+else. If you need any other value that isn't a token, stop and ask.

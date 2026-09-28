@@ -8,34 +8,38 @@
  * GitHub gist. The token is read from localStorage, sent in the Authorization
  * header of a request to api.github.com, and never logged or sent anywhere
  * else.
+ *
+ * Everything visual follows ../../design/README.md; the classes used here are
+ * defined in shelf.css from the tokens in ../../design/tokens.css.
  */
 (function () {
   "use strict";
 
   /* ─── The data ──────────────────────────────────────────────────────── */
 
+  /* The key is the stored value and the mobile badge; the full badge is the
+   * label. There are no older spellings: a file that uses anything else is
+   * not a shelf this app wrote.
+   *
+   * The app opts into the design system's optional colours so each status
+   * is told apart at a glance: Reading is blue, To read violet, Read green
+   * and Dropped red. The word still carries the status; the colour only
+   * makes the four easier to tell apart in a long list. */
   var STATUSES = {
-    reading: { label: "Reading", badge: "Reading", short: "CR", tone: "badge--reading" },
-    tbr: { label: "To read", badge: "To read", short: "TBR", tone: "badge--tbr" },
-    read: { label: "Read", badge: "Read", short: "R", tone: "badge--read" },
-    dropped: { label: "Dropped", badge: "Dropped", short: "DNF", tone: "badge--dropped" }
+    CR: { label: "Reading", badge: "Reading", short: "CR", pill: "badge badge--blue" },
+    TBR: { label: "To read", badge: "To read", short: "TBR", pill: "badge badge--violet" },
+    R: { label: "Read", badge: "Read", short: "R", pill: "badge badge--green" },
+    DNF: { label: "Dropped", badge: "Dropped", short: "DNF", pill: "badge badge--red" }
   };
 
-  var STATUS_ORDER = ["reading", "tbr", "read", "dropped"];
-
-  /* Older names that still mean one of the four above. normalise() falls back
-   * to `tbr` on anything it does not recognise, which is silent — a shelf
-   * saved under an old name would quietly lose its status rather than error.
-   * Keep this map; it costs nothing and it is the difference between a file
-   * loading and a file looking like it loaded. */
-  var LEGACY_STATUS = { dnf: "dropped" };
+  var STATUS_ORDER = ["CR", "TBR", "R", "DNF"];
 
   var FILTERS = [
     { id: "all", label: "All books" },
-    { id: "reading", label: "Reading" },
-    { id: "tbr", label: "To read" },
-    { id: "read", label: "Read" },
-    { id: "dropped", label: "Dropped" },
+    { id: "CR", label: "Reading" },
+    { id: "TBR", label: "To read" },
+    { id: "R", label: "Read" },
+    { id: "DNF", label: "Dropped" },
     { id: "favourites", label: "Favourites" }
   ];
 
@@ -53,7 +57,8 @@
     sort: "shelf.sort",
     gistId: "shelf.gistId",
     token: "shelf.token",
-    lastSaved: "shelf.lastSaved"
+    lastSaved: "shelf.lastSaved",
+    theme: "shelf.theme"
   };
 
   /* The gist already holds one file under this name, and so does the repo.
@@ -64,16 +69,17 @@
   var ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
   /* ─── Icons ───────────────────────────────────────────────────────────
-   * Outline, 24 viewBox, stroke-width 2, round caps and joins, drawn at 24
-   * and displayed at 16 or 20 — the system's convention. currentColor
-   * throughout, so nothing needs per-scheme handling.
+   * The paths are the design system's own, copied from ../../design/icons so
+   * the app works from file:// and needs no fetch. Outline, 24 viewBox, 2px
+   * stroke, round ends, currentColor throughout, shown at 16 or 20px.
    *
-   * The heart is the one exception: it is filled. It appears only on a book
-   * that IS a favourite, and an outline heart is the near-universal mark for
-   * the opposite. Drawn hollow it would read as "not favourited". */
+   * Two are filled. `brightness` is filled in the set itself — a half-lit
+   * disc is what it has to say. The heart is the set's outline heart, filled
+   * here on purpose: it appears only on a book that IS a favourite, and an
+   * outline heart is the near-universal mark for the opposite. */
   var ICONS = {
-    plus: { d: '<path d="M12 5v14"/><path d="M5 12h14"/>' },
-    search: { d: '<circle cx="11" cy="11" r="7"/><path d="M20.5 20.5l-4.2 -4.2"/>' },
+    plus: { d: '<path d="M12 5l0 14"/><path d="M5 12l14 0"/>' },
+    search: { d: '<path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/>' },
     sort: { d: '<path d="M3 9l4 -4l4 4m-4 -4v14"/><path d="M21 15l-4 4l-4 -4m4 4v-14"/>' },
     cloud: {
       d:
@@ -82,20 +88,30 @@
     close: { d: '<path d="M18 6l-12 12"/><path d="M6 6l12 12"/>' },
     check: { d: '<path d="M5 12l5 5l10 -10"/>' },
     calendar: {
-      d: '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/>'
+      d:
+        '<path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12"/>' +
+        '<path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/>' +
+        '<path d="M7 14h.013"/><path d="M10.01 14h.005"/><path d="M13.01 14h.005"/><path d="M16.015 14h.005"/>' +
+        '<path d="M13.015 17h.005"/><path d="M7.01 17h.005"/><path d="M10.01 17h.005"/>'
     },
     eye: {
-      d: '<path d="M2 12s3.6 -7 10 -7s10 7 10 7s-3.6 7 -10 7s-10 -7 -10 -7z"/><circle cx="12" cy="12" r="3"/>'
-    },
-    eyeOff: {
-      d:
-        '<path d="M3 3l18 18"/><path d="M10.6 5.2a9.9 9.9 0 0 1 1.4 -.2c6.4 0 10 7 10 7a17.7 17.7 0 0 1 -3.2 4.2"/>' +
-        '<path d="M6.6 6.6a17.7 17.7 0 0 0 -4.6 5.4s3.6 7 10 7a9.9 9.9 0 0 0 4.2 -.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+      d: '<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>'
     },
     heart: {
       fill: true,
       d: '<path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/>'
-    }
+    },
+    brightness: {
+      fill: true,
+      stroke: false,
+      d: '<path d="M17 3.34a10 10 0 1 1 -15 8.66l.005 -.324a10 10 0 0 1 14.995 -8.336m-9 1.732a8 8 0 0 0 4.001 14.928l-.001 -16a8 8 0 0 0 -4 1.072"/>'
+    },
+    sun: {
+      d:
+        '<path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>' +
+        '<path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/>'
+    },
+    moon: { d: '<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008"/>' }
   };
 
   function icon(name) {
@@ -103,7 +119,7 @@
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 24 24");
     svg.setAttribute("fill", spec.fill ? "currentColor" : "none");
-    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke", spec.stroke === false ? "none" : "currentColor");
     svg.setAttribute("stroke-width", "2");
     svg.setAttribute("stroke-linecap", "round");
     svg.setAttribute("stroke-linejoin", "round");
@@ -186,15 +202,14 @@
    * dateRead on a book that is not read — into the running state. */
   function normalise(raw) {
     var b = raw && typeof raw === "object" ? raw : {};
-    var named = LEGACY_STATUS[b.status] || b.status;
-    var status = STATUSES[named] ? named : "tbr";
+    var status = STATUSES[b.status] ? b.status : "TBR";
     var date = typeof b.dateRead === "string" && ISO_DATE.test(b.dateRead) ? b.dateRead : null;
     return {
       id: typeof b.id === "string" && b.id ? b.id : newId(),
       title: typeof b.title === "string" ? b.title : "",
       author: typeof b.author === "string" ? b.author : "",
       status: status,
-      dateRead: status === "read" ? date : null,
+      dateRead: status === "R" ? date : null,
       favourite: b.favourite === true,
       notes: typeof b.notes === "string" ? b.notes : "",
       addedAt: typeof b.addedAt === "string" && b.addedAt ? b.addedAt : new Date().toISOString()
@@ -235,7 +250,7 @@
   }
 
   function counts() {
-    var out = { all: state.books.length, favourites: 0, reading: 0, tbr: 0, read: 0, dropped: 0 };
+    var out = { all: state.books.length, favourites: 0, CR: 0, TBR: 0, R: 0, DNF: 0 };
     state.books.forEach(function (b) {
       out[b.status]++;
       if (b.favourite) out.favourites++;
@@ -307,7 +322,7 @@
       onclick: function () { setFilter(filter.id); }
     },
       el("span", { text: filter.label }),
-      el("span", { class: "code-sm nav__count", text: String(count) })
+      el("span", { class: "code nav__count", text: String(count) })
     );
   }
 
@@ -322,7 +337,7 @@
       onclick: function () { setFilter(filter.id); }
     },
       el("span", { text: filter.label }),
-      el("span", { class: "num", text: String(count) })
+      el("span", { class: "code-sm", text: String(count) })
     );
   }
 
@@ -362,7 +377,7 @@
     var status = STATUSES[book.status];
     var dated = Boolean(book.dateRead);
 
-    var badge = el("span", { class: "badge " + status.tone },
+    var badge = el("span", { class: status.pill },
       el("span", { "aria-hidden": "true", class: "row__badge-long", text: status.badge }),
       el("span", { "aria-hidden": "true", class: "row__badge-short", text: status.short }),
       el("span", { class: "sr-only", text: status.label })
@@ -380,8 +395,8 @@
           el("span", { class: "row__author", text: book.author }),
           el("span", { class: "row__sep", "aria-hidden": "true", text: "·" }),
           dated
-            ? el("span", { class: "row__date num", text: book.dateRead })
-            : el("span", { class: "row__date num", "aria-hidden": "true", text: "—" })
+            ? el("span", { class: "row__date mono", text: book.dateRead })
+            : el("span", { class: "row__date mono", "aria-hidden": "true", text: "—" })
         )
       ),
       el("span", { class: "row__fav" },
@@ -537,7 +552,7 @@
       el("h2", { class: "h3 modal__title", id: titleId, text: view.title }),
       el("button", {
         type: "button",
-        class: "btn btn--ghost icon-btn",
+        class: "btn icon-btn",
         "aria-label": "Close",
         onclick: closeModal
       }, icon("close"))
@@ -614,7 +629,7 @@
     var status = STATUSES[book.status];
 
     var badges = el("div", { class: "detail__badges" },
-      el("span", { class: "badge " + status.tone, text: status.badge }),
+      el("span", { class: status.pill, text: status.badge }),
       book.favourite
         ? el("span", { class: "badge" }, icon("heart"), el("span", { text: "Favourite" }))
         : null
@@ -675,7 +690,7 @@
       bookId: id || null,
       draft: book
         ? { title: book.title, author: book.author, status: book.status, dateRead: book.dateRead, favourite: book.favourite, notes: book.notes }
-        : { title: "", author: "", status: "tbr", dateRead: null, favourite: false, notes: "" },
+        : { title: "", author: "", status: "TBR", dateRead: null, favourite: false, notes: "" },
       invalid: {}
     });
   }
@@ -710,7 +725,7 @@
 
     function paintDate() {
       clear(dateSlot);
-      if (d.status !== "read") return;
+      if (d.status !== "R") return;
       append(dateSlot, field({
         id: "book-date",
         label: "Date read",
@@ -730,7 +745,7 @@
           checked: d.status === key,
           onchange: function () {
             d.status = key;
-            if (key !== "read") d.dateRead = null;
+            if (key !== "R") d.dateRead = null;
             paintDate();
           }
         }),
@@ -805,7 +820,7 @@
   function field(opts) {
     var hintId = opts.id + "-hint";
     var input = el("input", {
-      class: "field-input" + (opts.mono ? " num" : ""),
+      class: "field-input" + (opts.mono ? " mono" : ""),
       id: opts.id,
       type: opts.type || "text",
       value: opts.value,
@@ -900,7 +915,7 @@
     });
 
     var tokenInput = el("input", {
-      class: "field-input num",
+      class: "field-input mono",
       id: "gist-token",
       type: d.reveal ? "text" : "password",
       value: d.token,
@@ -914,10 +929,13 @@
       }
     });
 
+    /* The icon set has an eye and no crossed-out eye, so the button is a
+     * toggle: pressed while the token is showing, and the label says what
+     * the next press does. */
     var eye = el("button", {
       type: "button",
       id: "gist-token-eye",
-      class: "btn btn--ghost icon-btn secret__eye",
+      class: "btn icon-btn secret__eye",
       "aria-label": d.reveal ? "Hide token" : "Show token",
       "aria-pressed": String(d.reveal),
       onclick: function () {
@@ -925,7 +943,7 @@
         m.focus = "#gist-token-eye";
         renderModal();
       }
-    }, icon(d.reveal ? "eyeOff" : "eye"));
+    }, icon("eye"));
 
     var token = el("div", { class: "field", "data-invalid": m.invalid.token ? "" : null },
       el("label", { class: "field__label", for: "gist-token", text: "GitHub access token" }),
@@ -1257,6 +1275,50 @@
     return books.map(normalise);
   }
 
+  /* ─── Theme ───────────────────────────────────────────────────────────
+   * Two stops. From System one press forces the opposite of what the OS is
+   * showing; the next returns to System. The forced choice is `color-scheme`
+   * on <html>, and light-dark() in the tokens does the rest. It is saved
+   * under KEYS.theme and re-applied by the inline script at the top of
+   * <head>, before any stylesheet, so the page never flashes. While on
+   * System the page follows the OS if it changes. */
+
+  var THEME_NAMES = { system: "System", light: "Light", dark: "Dark" };
+  var THEME_ICONS = { system: "brightness", light: "sun", dark: "moon" };
+  var darkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+  function forcedTheme() {
+    var v = document.documentElement.style.colorScheme;
+    return v === "light" || v === "dark" ? v : null;
+  }
+
+  function systemTheme() {
+    return darkQuery && darkQuery.matches ? "dark" : "light";
+  }
+
+  function setTheme(forced) {
+    document.documentElement.style.colorScheme = forced || "";
+    write(KEYS.theme, forced || null);
+    paintThemeToggle();
+  }
+
+  function cycleTheme() {
+    setTheme(forcedTheme() ? null : systemTheme() === "dark" ? "light" : "dark");
+  }
+
+  function paintThemeToggle() {
+    var button = nodes.themeToggle;
+    if (!button) return;
+    var current = forcedTheme() || "system";
+    var next = current === "system" ? (systemTheme() === "dark" ? "light" : "dark") : "system";
+    clear(button);
+    append(button, [icon(THEME_ICONS[current])]);
+    button.setAttribute(
+      "aria-label",
+      "Theme: " + THEME_NAMES[current] + ". Switch to " + THEME_NAMES[next].toLowerCase() + "."
+    );
+  }
+
   /* ─── Wiring ──────────────────────────────────────────────────────────── */
 
   function onAction(e) {
@@ -1266,6 +1328,7 @@
     if (action === "add") openForm(null);
     else if (action === "cloud") openCloud();
     else if (action === "sort") toggleMenu();
+    else if (action === "theme") cycleTheme();
     else if (action === "search-open") setSearchOpen(true);
     else if (action === "search-cancel") setSearchOpen(false);
     else if (action === "search-clear") {
@@ -1301,16 +1364,24 @@
     nodes.search = document.getElementById("search");
     nodes.searchClear = document.querySelector(".search__clear");
     nodes.overlayRoot = document.getElementById("overlay-root");
+    nodes.themeToggle = document.getElementById("theme-toggle");
 
     state.books = loadBooks();
     var sort = read(KEYS.sort, "added");
     state.sort = COMPARE[sort] ? sort : "added";
 
     fillIcons();
+    paintThemeToggle();
     nodes.app.dataset.search = "closed";
 
     document.addEventListener("click", onAction);
     document.addEventListener("keydown", onKeydown);
+
+    if (darkQuery) {
+      var onSystemChange = function () { if (!forcedTheme()) paintThemeToggle(); };
+      if (darkQuery.addEventListener) darkQuery.addEventListener("change", onSystemChange);
+      else if (darkQuery.addListener) darkQuery.addListener(onSystemChange);
+    }
 
     nodes.search.addEventListener("input", function (e) {
       state.query = e.target.value;

@@ -1,20 +1,84 @@
-/* Shelf — app layout.
+/* Shelf — app styles.
  *
- * Everything visual comes from design/system. This file holds composition
- * only: the app grid, the library rows, the modal frame. There is not a
- * single colour literal here, and there must never be one — every colour is
- * var(--token). No transitions either; bundle.css already enforces that.
+ * Built on ../../design/tokens.css and the rules in ../../design/README.md.
+ * The design system ships tokens, text styles, fonts and icons; everything
+ * else here — buttons, fields, checks, badges, the menu, the modal frame and
+ * the app layout — is composed from those tokens and nothing else.
  *
- * Mobile first, one breakpoint at bp-desktop (48rem / 768px), per the system.
+ * There is not a single colour literal in this file. Hover and pressed states
+ * are the resting colour moved a step toward `ink` with color-mix(), which is
+ * what the README asks for, and it reads correctly in both schemes because
+ * `ink` flips with them. No transitions, no animations, no shadows except the
+ * one the menu takes.
+ *
+ * Mobile first. Two breakpoints, the system's own: 48rem (768px) and 75rem
+ * (1200px). Page gutters grow 16 → 24 → 32px across them.
  */
 
-/* Now that the page itself is the scroller, the scrollbar's 15px has to be
- * reserved permanently. Without this the gutter appears and disappears —
- * when a modal locks the body, and every time a filter takes the list under
- * one screenful — and the whole layout jumps sideways each time. */
+/* ─── Derived values ─────────────────────────────────────────────────────
+ * Every one is a token mixed toward another token — never a new colour. */
+
+:root {
+  --surface-raised-hover: color-mix(in oklab, var(--surface-raised) 93%, var(--ink));
+  --surface-raised-active: color-mix(in oklab, var(--surface-raised) 87%, var(--ink));
+  --surface-sunken-hover: color-mix(in oklab, var(--surface-sunken) 94%, var(--ink));
+  --accent-hover: color-mix(in oklab, var(--accent) 88%, var(--ink));
+  --accent-active: color-mix(in oklab, var(--accent) 78%, var(--ink));
+  --border-hover: color-mix(in oklab, var(--border) 80%, var(--ink));
+  --ink-disabled: color-mix(in oklab, var(--ink) 38%, var(--surface));
+  --border-disabled: color-mix(in oklab, var(--border) 45%, var(--surface));
+
+  /* The switch knob when off. It has to be the lightest value each scheme
+   * holds, or it is a dark dot on a dark-grey track in dark mode — which
+   * rules out surface-raised (#1c1c1c there). Composed from tokens. */
+  --switch-knob: light-dark(var(--surface-raised), var(--ink));
+
+  /* Two app-level sizes that are not tokens. The topbar height is one row of
+   * the grid and the sticky offsets have to agree with it, so it is written
+   * once. The touch target is the 44px that thumbs need. */
+  --bar-height: 64px;
+  --touch: 44px;
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+/* Nothing moves. */
+*,
+*::before,
+*::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* The page is the only scroller; reserve the scrollbar's width permanently
+ * so the layout does not jump when a modal locks the body or the list drops
+ * under one screenful. */
 html { scrollbar-gutter: stable; }
 
-/* ─── Utilities ─────────────────────────────────────────────────────────── */
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font: 400 16px/24px var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+::selection { background: var(--accent-soft); color: var(--ink); }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+
+strong { font-weight: 600; }
+
+[hidden] { display: none !important; }
 
 .sr-only {
   position: absolute;
@@ -28,35 +92,325 @@ html { scrollbar-gutter: stable; }
   border: 0;
 }
 
-/* An icon-only .btn. Width only — the height stays the component's own, so a
- * 40px icon button lines up with a 40px text button. 44px on a phone, which is
- * what spec.md asks for of every touch target.
- *
- * Chrome is drawn in `ink` and only takes the accent under the pointer.
- * btn--ghost's own colour is `accent` at rest, which puts the one hue on every
- * icon in the topbar at once and leaves hover with nothing to say. */
-.icon-btn {
+/* ─── Icons ─────────────────────────────────────────────────────────────
+ * Drawn on a 24px grid, 2px stroke, round ends; shown at 16px beside text
+ * and 20px alone. They take the colour of the surrounding text. */
+
+svg { flex: none; }
+
+.btn svg { width: 16px; height: 16px; }
+.icon-btn svg { width: 20px; height: 20px; }
+
+/* ─── Button ────────────────────────────────────────────────────────────
+ * Three emphasis levels and a danger outline; three heights, 32/40/48.
+ * Labels are body-sm at the regular weight. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding-inline: var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--ink);
+  font: 400 14px/20px var(--font-sans);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+}
+
+.btn--sm { min-height: 32px; padding-inline: var(--space-3); }
+.btn--lg { min-height: 48px; padding-inline: var(--space-5); font-size: 16px; line-height: 24px; }
+.btn--pill { border-radius: var(--radius-full); }
+
+.btn--primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn--primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn--primary:active { background: var(--accent-active); border-color: var(--accent-active); }
+
+.btn--secondary { background: var(--surface-raised); border-color: var(--border); }
+.btn--secondary:hover { background: var(--surface-raised-hover); border-color: var(--border-hover); }
+.btn--secondary:active { background: var(--surface-raised-active); }
+
+.btn--ghost { color: var(--accent); }
+.btn--ghost:hover { background: var(--surface-raised-hover); }
+.btn--ghost:active { background: var(--surface-raised-active); }
+
+/* The icon button: an icon-only button in a header, toolbar or field. Its
+ * own variant, not a ghost — a row of accent icons would read as a row of
+ * links — so the icon is ink until the button holds something open or is
+ * pressed, when the selected rule below takes it to accent. Width only —
+ * the height stays the size's own, so a 40px icon button lines up with a
+ * 40px text button. Full touch width on a phone, 40px on a pointer. */
+.icon-btn { width: var(--touch); padding-inline: 0; color: var(--ink); }
+.icon-btn:hover { background: var(--surface-raised-hover); }
+.icon-btn:active { background: var(--surface-raised-active); }
+
+/* Only the button that actually deletes. Outline and text, never a fill;
+ * the border and text stay the same red on hover. */
+.btn--danger { color: var(--danger); border-color: var(--danger); }
+.btn--danger:hover,
+.btn--danger:active { background: var(--danger-soft); }
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  background: transparent;
+  color: var(--ink-disabled);
+  border-color: var(--border-disabled);
+  cursor: not-allowed;
+}
+
+/* A button holding something open, or a toggle that is on, is selected:
+ * accent-soft with accent text, the same signal as a chosen filter. */
+.btn[aria-expanded="true"],
+.btn[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent);
+}
+
+/* ─── Field ─────────────────────────────────────────────────────────────
+ * Label above, control, optional hint, stacked at space-2. Control text is
+ * 16px so phones do not zoom on focus. An error is a thicker ink border and
+ * the wording — never red. */
+
+.field { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.field__label {
+  font: 600 12px/16px var(--font-sans);
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
+
+.field-input,
+.field-area {
+  width: 100%;
+  min-height: 40px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font: 400 16px/24px var(--font-sans);
+}
+
+.field-area { min-height: 96px; resize: vertical; }
+
+.field-input::placeholder,
+.field-area::placeholder { color: var(--ink-muted); }
+
+.field-input:hover,
+.field-area:hover { border-color: var(--border-hover); }
+
+.field-input:focus-visible,
+.field-area:focus-visible { outline-offset: 0; }
+
+.field__hint { font: 400 12px/16px var(--font-sans); color: var(--ink-muted); }
+
+/* The extra border width is taken out of the padding so the text does not
+ * shift when a field becomes invalid. */
+.field[data-invalid] .field-input,
+.field[data-invalid] .field-area {
+  border-color: var(--ink);
+  border-width: 2px;
+  padding: calc(var(--space-2) - 1px) calc(var(--space-3) - 1px);
+}
+
+.field[data-invalid] .field__hint { color: var(--ink); }
+
+/* ─── Checkbox · Radio · Switch ─────────────────────────────────────────
+ * Real inputs restyled with appearance: none, so keyboard, forms and screen
+ * readers keep working. The whole <label> is the hit target. */
+
+.check {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--ink);
+  font: 400 16px/24px var(--font-sans);
+  cursor: pointer;
+}
+
+.check input {
+  flex: none;
+  display: grid;
+  place-content: center;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  appearance: none;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.check input::after {
+  content: "";
+  width: 10px;
+  height: 5px;
+  margin-top: -3px;
+  border-left: 2px solid var(--on-accent);
+  border-bottom: 2px solid var(--on-accent);
+  rotate: -45deg;
+  opacity: 0;
+}
+
+.check input:checked { background: var(--accent); border-color: var(--accent); }
+.check input:checked::after { opacity: 1; }
+.check:hover input:not(:disabled) { border-color: var(--border-hover); }
+
+/* Radio: round, a dot instead of a tick. */
+.check--radio input { border-radius: var(--radius-full); }
+
+.check--radio input::after {
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--on-accent);
+  rotate: none;
+}
+
+/* Switch: a 44×24 track, the body line-height, so it centres on its label.
+ * The knob jumps; nothing slides. Off is a filled `border` track with a light
+ * knob, because a filled pill still reads at low contrast where a hairline
+ * would not. */
+.check--switch input {
+  position: relative;
+  display: block;
   width: 44px;
-  padding-inline: 0;
+  height: 24px;
+  margin: 0;
+  background: var(--border);
+  border-color: var(--border);
+  border-radius: var(--radius-full);
+}
+
+.check--switch input::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--switch-knob);
+  rotate: none;
+  opacity: 1;
+}
+
+.check--switch input:checked::after {
+  left: auto;
+  right: 1px;
+  background: var(--on-accent);
+}
+
+/* ─── Badge ─────────────────────────────────────────────────────────────
+ * A 24px pill in the label style. Default is accent on accent-soft; neutral
+ * is ink-muted on surface-sunken. No border, never danger. */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 24px;
+  padding-inline: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font: 600 12px/16px var(--font-sans);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.badge--neutral { background: var(--surface-sunken); color: var(--ink-muted); }
+
+/* The status pills. The app opts into the system's optional colours: one
+ * hue per status, each on its own soft tint, never mixed. */
+.badge--blue   { background: var(--blue-soft);   color: var(--blue); }
+.badge--violet { background: var(--violet-soft); color: var(--violet); }
+.badge--green  { background: var(--green-soft);  color: var(--green); }
+.badge--red    { background: var(--red-soft);    color: var(--red); }
+
+.badge svg { width: 12px; height: 12px; }
+
+/* ─── Selection and hover ───────────────────────────────────────────────
+ * Two signals on two grounds that never share one:
+ *   hover     → surface-sunken a step toward ink, with ink text
+ *   selected  → accent-soft with accent text
+ * Keyed off the ARIA that has to be there anyway. Selected is declared after
+ * hover, so a selected item keeps its ground under the pointer. */
+
+.selectable:hover {
+  background: var(--surface-sunken-hover);
   color: var(--ink);
 }
 
-.icon-btn:hover { color: var(--accent); }
-.icon-btn:active { color: var(--accent-active); }
-
-.icon-btn svg,
-.btn svg {
-  width: 20px;
-  height: 20px;
-  flex: none;
+.selectable[aria-pressed="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
-/* An icon button holding a menu open keeps its own hover ground while the
- * menu is up. btn--ghost is the one control the system lets hover into
- * accent-soft, precisely because it has no selected state to be confused
- * with — so there is no ambiguity in reusing it here. */
-.btn--ghost[aria-expanded="true"] { background: var(--accent-soft); }
-.icon-btn[aria-expanded="true"] { color: var(--accent); }
+/* Anything that floats over the page with nothing behind it: the border is
+ * the edge, the shadow is the lift. The one shadow in the app. */
+.overlay {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+}
+
+/* The dimmed layer behind a modal. The panel on top takes no shadow. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--backdrop);
+}
+
+/* ─── Card and well ─────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+/* A read-only panel is a sunken well, defined by its fill. No border. */
+.panel {
+  padding: var(--space-3);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+}
+
+.panel--row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.panel--row svg { width: 20px; height: 20px; color: var(--ink-muted); }
+
+.panel--row > :first-child {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.panel--notes { white-space: pre-wrap; }
 
 /* ─── App shell ─────────────────────────────────────────────────────────
  * One grid. The wordmark is a single <h1> that moves between the phone's
@@ -67,7 +421,7 @@ html { scrollbar-gutter: stable; }
   min-height: 100dvh;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: 64px auto minmax(0, 1fr);
+  grid-template-rows: var(--bar-height) auto minmax(0, 1fr);
   grid-template-areas:
     "brand   bar"
     "chips   chips"
@@ -84,10 +438,7 @@ html { scrollbar-gutter: stable; }
   border-bottom: 1px solid var(--border);
 }
 
-.app__wordmark {
-  margin: 0;
-  white-space: nowrap;
-}
+.app__wordmark { margin: 0; white-space: nowrap; }
 
 .app__bar {
   grid-area: bar;
@@ -100,9 +451,8 @@ html { scrollbar-gutter: stable; }
   border-bottom: 1px solid var(--border);
 }
 
-/* The topbar is pinned at every width. Both halves are their own grid item in
- * row 1, and both carry the raised ground and the hairline already, so they
- * stick as one bar with the list passing underneath. */
+/* The topbar is pinned at every width; both halves carry the same ground and
+ * hairline, so they stick as one bar. */
 .app__brand,
 .app__bar {
   position: sticky;
@@ -116,25 +466,6 @@ html { scrollbar-gutter: stable; }
   gap: var(--space-1);
 }
 
-/* The theme toggle is the system's own component and keeps all of its
- * behaviour — bundle.js still owns the glyphs, the cycle and the aria-label.
- * Only its chrome changes: in this topbar it stands in a row of icon buttons,
- * so it drops its pill (raised ground, hairline, radius-full) for their
- * ground and their radius-md corner. Sizing and colour come from .icon-btn,
- * which it now carries. */
-.app__actions .theme-toggle {
-  background: transparent;
-  border-color: transparent;
-  border-radius: var(--radius-md);
-}
-
-.app__actions .theme-toggle:hover {
-  background: var(--accent-soft);
-  border-color: transparent;
-}
-
-.app__actions .theme-toggle svg { width: 20px; height: 20px; }
-
 .app__rule {
   width: 1px;
   height: 24px;
@@ -142,8 +473,12 @@ html { scrollbar-gutter: stable; }
   background: var(--border);
 }
 
+/* The theme switcher is an icon button like the rest of the bar. The icon
+ * shows the state; the accessible label names it and what the next press
+ * does. Nothing here to style. */
+
 /* The phone's search field and its Cancel exist only while search is open;
- * the desktop's search field is always there and the opener never is. */
+ * the desktop's field is always there and the opener never is. */
 .app__search,
 .app__search-cancel { display: none; }
 
@@ -159,13 +494,12 @@ html { scrollbar-gutter: stable; }
 .app[data-search="open"] .app__search,
 .app[data-search="open"] .app__search-cancel { display: block; }
 
-.app__search { flex: 1 1 auto; min-width: 0; position: relative; }
+.app__search { position: relative; flex: 1 1 auto; min-width: 0; }
 .app__search-cancel { flex: none; }
 
-/* The native type="search" clear control renders in the browser's own accent —
- * a blue that is in no token — so it is suppressed and replaced with the
- * system's close glyph, which inherits currentColor like every other icon.
- * The button is only in the DOM while there is something to clear. */
+/* The native search clear control draws in the browser's own accent, which
+ * is in no token — it is suppressed and replaced with the system's x, which
+ * inherits currentColor like every other icon. */
 .search__input { padding-right: var(--space-8); }
 
 .search__input::-webkit-search-cancel-button,
@@ -176,14 +510,9 @@ html { scrollbar-gutter: stable; }
   top: 50%;
   right: var(--space-1);
   translate: 0 -50%;
-  width: 44px;
-  padding-inline: 0;
 }
 
 .search__clear svg { width: 16px; height: 16px; }
-
-/* .btn sets a display, which outranks the UA rule for [hidden]. */
-.search__clear[hidden] { display: none; }
 
 /* The sidebar is desktop only; the pills are its phone form. */
 .app__side { display: none; }
@@ -191,37 +520,39 @@ html { scrollbar-gutter: stable; }
 .app__chips {
   grid-area: chips;
   min-width: 0;
-  padding: var(--space-4) 0 0;
+  padding-top: var(--space-4);
 }
 
 .app__content {
   grid-area: content;
   min-width: 0;
   padding: var(--space-4);
+  /* Room for the floating button, and for the home indicator beneath it. */
+  padding-bottom: calc(var(--space-9) + env(safe-area-inset-bottom, 0px));
 }
 
-/* ─── Filter pills (phone) ────────────────────────────────────────────────
- * badge badge--neutral selectable + aria-pressed, per components/Badge.md.
- * The system's badge is 24px; a filter chip is also a touch target, so the
- * height is raised to the 44px spec.md asks for. Nothing else is touched —
- * the ground, the text colour and the selected state are all the component's. */
+/* ─── Filter pills (phone) ──────────────────────────────────────────────
+ * badge badge--neutral selectable with aria-pressed. The badge is 24px; a
+ * filter is also a touch target, so it grows to the touch height. Nothing
+ * else changes — the ground, text and selected state are the badge's. */
 
 .chips {
   display: flex;
   gap: var(--space-2);
+  padding-inline: var(--space-4);
   overflow-x: auto;
   scrollbar-width: none;
-  padding-inline: var(--space-4);
 }
 
 .chips::-webkit-scrollbar { display: none; }
 
 .chips .badge {
-  min-height: 44px;
   flex: none;
+  min-height: var(--touch);
   cursor: pointer;
-  font-family: var(--font-sans);
 }
+
+.chips .badge .code-sm { color: inherit; }
 
 /* ─── Filter list (desktop sidebar) ─────────────────────────────────────── */
 
@@ -243,10 +574,7 @@ html { scrollbar-gutter: stable; }
   color: var(--ink-muted);
 }
 
-.nav__rule {
-  height: 1px;
-  background: var(--border);
-}
+.nav__rule { height: 1px; background: var(--border); }
 
 /* .selectable carries hover and selected; this only gives it a shape. */
 .nav__item {
@@ -255,26 +583,18 @@ html { scrollbar-gutter: stable; }
   justify-content: space-between;
   gap: var(--space-2);
   width: 100%;
-  min-height: 44px;
+  min-height: var(--touch);
   padding-inline: var(--space-3);
   background: transparent;
   color: var(--ink);
-  border: 1px solid transparent;
+  border: 0;
   border-radius: var(--radius-md);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 600;
+  font: 600 16px/24px var(--font-sans);
   text-align: left;
   cursor: pointer;
 }
 
-.nav__item:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.nav__count { color: var(--ink-muted); }
+.nav__count { font-weight: 400; color: var(--ink-muted); }
 
 /* Selected takes the whole row into accent, count included. */
 .nav__item[aria-pressed="true"] .nav__count { color: inherit; }
@@ -284,11 +604,10 @@ html { scrollbar-gutter: stable; }
 .fab {
   position: fixed;
   right: var(--space-4);
-  bottom: var(--space-4);
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
   z-index: 10;
   width: 56px;
   height: 56px;
-  min-height: 56px;
   padding: 0;
   border-radius: var(--radius-full);
 }
@@ -313,9 +632,9 @@ html { scrollbar-gutter: stable; }
   color: var(--ink-muted);
 }
 
-/* One row, one click target — including the heart, which is an indicator and
- * never a control. spec.md is explicit that this is why the row is a button
- * and the library is not a <table>. */
+/* One row, one click target — including the heart, which is an indicator
+ * and never a control. That is why the row is a button and the library is
+ * not a <table>. */
 .row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -334,21 +653,17 @@ html { scrollbar-gutter: stable; }
 
 .row:last-child { border-bottom: 0; }
 
-/* A row sits on the raised ground of the list, so it darkens its own fill.
- * It has no selected state, so surface-sunken-hover — which the system keeps
- * for things that also have one — would be the wrong signal here. */
-.row:hover { background: var(--surface-hover); }
+/* A row sits on the raised ground of the list, so hover takes that ground a
+ * step toward ink. It has no selected state. */
+.row:hover { background: var(--surface-raised-hover); }
 
-.row:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
+.row:focus-visible { outline-offset: -2px; }
 
 .row__status { display: flex; }
 .row__status .badge { min-width: var(--space-7); justify-content: center; }
 
-/* The mobile badge is the desktop one shortened to fit a 390px row. It is not
- * a different status: both carry the full label as accessible text. */
+/* The mobile badge is the desktop one shortened to fit a 390px row. It is
+ * not a different status: both carry the full label as accessible text. */
 .row__badge-long { display: none; }
 
 .row__main { min-width: 0; }
@@ -416,10 +731,10 @@ html { scrollbar-gutter: stable; }
 .menu {
   position: fixed;
   z-index: 40;
-  width: 208px;
-  padding: var(--space-1);
   display: flex;
   flex-direction: column;
+  width: 208px;
+  padding: var(--space-1);
 }
 
 .menu__heading {
@@ -434,32 +749,23 @@ html { scrollbar-gutter: stable; }
   justify-content: space-between;
   gap: var(--space-2);
   width: 100%;
-  min-height: 44px;
+  min-height: var(--touch);
   padding-inline: var(--space-3);
   background: transparent;
   color: var(--ink);
-  border: 1px solid transparent;
+  border: 0;
   border-radius: var(--radius-md);
-  font-family: var(--font-sans);
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font: 400 14px/20px var(--font-sans);
   text-align: left;
   cursor: pointer;
 }
 
-.menu__item:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.menu__item svg { width: 16px; height: 16px; flex: none; }
+.menu__item svg { width: 16px; height: 16px; }
 
 /* ─── Modals ────────────────────────────────────────────────────────────
- * A modal panel is an ordinary .card and takes NO shadow — the scrim is
- * already doing that work. The card's own padding is zeroed so the header
- * and footer rules can bleed to its edges; the parts carry it instead.
+ * A modal is a card over the backdrop, with no shadow. The card's own
+ * padding is zeroed so the header and footer rules can run edge to edge;
+ * the parts carry it instead.
  *
  * On a phone, forms and details are bottom sheets and confirmations stay
  * centred dialogs (.modal--dialog), because a confirmation is short and
@@ -503,7 +809,6 @@ html { scrollbar-gutter: stable; }
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
-  background: var(--surface-raised);
   border-bottom: 1px solid var(--border);
 }
 
@@ -527,11 +832,10 @@ html { scrollbar-gutter: stable; }
   flex-direction: column-reverse;
   align-items: stretch;
   gap: var(--space-3);
-  margin: 0;
-  padding: 0 var(--space-4) var(--space-4);
+  padding: 0 var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
 }
 
-/* A confirmation keeps its rules: it is a dialog at every width. */
+/* A confirmation keeps its rule: it is a dialog at every width. */
 .modal--dialog .modal__foot {
   padding: var(--space-4);
   border-top: 1px solid var(--border);
@@ -548,7 +852,6 @@ html { scrollbar-gutter: stable; }
 .detail__title { margin: 0; }
 .detail__author { margin: 0; color: var(--ink-muted); }
 .detail__badges { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.detail__badges svg { width: 12px; height: 12px; }
 
 .detail__field {
   display: flex;
@@ -558,34 +861,7 @@ html { scrollbar-gutter: stable; }
 
 .detail__label { color: var(--ink-muted); }
 
-/* A read-only panel is a sunken well, and a well is defined by its fill.
- * No border — `border` is only ~1.3:1 against surface-sunken. */
-.panel {
-  padding: var(--space-3);
-  background: var(--surface-sunken);
-  border-radius: var(--radius-md);
-  color: var(--ink);
-}
-
-.panel--row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.panel--row svg { width: 20px; height: 20px; flex: none; color: var(--ink-muted); }
-
-.panel--row > :first-child {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 0;
-}
-
-.panel--notes { white-space: pre-wrap; }
-
-/* ─── Form ──────────────────────────────────────────────────────────────── */
+/* Form */
 
 .form {
   display: flex;
@@ -600,12 +876,10 @@ html { scrollbar-gutter: stable; }
   margin: 0;
   padding: 0;
   border: 0;
+  min-width: 0;
 }
 
-.fieldset__legend {
-  padding: 0;
-  color: var(--ink-muted);
-}
+.fieldset__legend { padding: 0; color: var(--ink-muted); }
 
 .radios {
   display: grid;
@@ -618,10 +892,8 @@ html { scrollbar-gutter: stable; }
  * must not leave the form's gap behind it either. */
 .form__date:empty { display: none; }
 
-/* Favourite, as the wireframes draw it: the label at the start of the row and
- * the switch at the end, full width. Only the direction and the width change —
- * the whole <label> is still the hit target, which is the component's rule.
- * The 24px track is the body line-height, so it centres with no nudge. */
+/* Favourite: the label at the start of the row and the switch at the end.
+ * The whole <label> is still the hit target. */
 .form__switch {
   display: flex;
   flex-direction: row-reverse;
@@ -630,31 +902,25 @@ html { scrollbar-gutter: stable; }
   width: 100%;
 }
 
-/* ─── Cloud settings ────────────────────────────────────────────────────── */
+/* Cloud settings */
 
 .secret { position: relative; }
-
 .secret .field-input { padding-right: var(--space-8); }
 
-/* The reveal button sits inside the field's border. 44px wide on a phone —
- * spec.md is explicit that the wireframe's 32 is too small for a thumb — but
- * it keeps .btn's own 40px height, because the field it lives in is 42px and
- * a 44px control would push its hover ground out through the border. The
- * thumb gets 44×40 either way. */
+/* The reveal button sits inside the field's border: full touch width on a
+ * phone, at the button's own 40px height, because the field is 42px tall. */
 .secret__eye {
   position: absolute;
   top: 50%;
   right: var(--space-1);
   translate: 0 -50%;
-  width: 44px;
-  padding-inline: 0;
 }
 
 /* The modal body is a flex column at space-5; the browser's own paragraph
- * margin lands on top of that gap and pushes the first field out of rhythm. */
-.cloud__intro { margin-block: 0; }
+ * margin would land on top of that gap. */
+.cloud__intro { margin: 0; }
 
-.cloud__status { color: var(--ink); }
+.cloud__status { margin: 0; color: var(--ink); }
 .cloud__status[data-tone="muted"] { color: var(--ink-muted); }
 
 .confirm__body { margin: 0; }
@@ -666,14 +932,11 @@ html { scrollbar-gutter: stable; }
 
   .icon-btn { width: 40px; }
 
-  /* The page is the only thing that scrolls. Giving the library its own
-   * overflow container puts a second scrollbar on screen and makes the wheel
-   * dead everywhere but over the table itself — so the grid grows with the
-   * list and the chrome is pinned with `sticky` instead. */
+  /* The page is the only thing that scrolls: the grid grows with the list
+   * and the chrome is pinned with sticky. */
   .app {
-    min-height: 100dvh;
     grid-template-columns: 264px minmax(0, 1fr);
-    grid-template-rows: 64px auto;
+    grid-template-rows: var(--bar-height) auto;
     grid-template-areas:
       "brand bar"
       "side  content";
@@ -692,17 +955,11 @@ html { scrollbar-gutter: stable; }
 
   .app__search {
     display: block;
-    width: 360px;
     flex: 0 1 360px;
+    width: 360px;
   }
 
-  /* Same treatment as the token field's reveal: 32px on a pointer, 44 on a
-   * thumb — spec.md's rule for controls that sit inside a field's border. */
-  .search__clear {
-    width: 32px;
-    min-height: 32px;
-  }
-
+  .search__clear { width: 32px; min-height: 32px; }
   .search__input { padding-right: var(--space-7); }
 
   .app__search-open,
@@ -721,26 +978,25 @@ html { scrollbar-gutter: stable; }
 
   .app[data-search="open"] .app__search-cancel { display: none; }
 
-  /* Two parts, because the sidebar has two jobs. The outer one fills the whole
-   * column so the raised ground and its hairline run the full height of the
-   * page however long the list gets; the inner one is a viewport-tall sticky
-   * panel, which is what keeps the filters and Add book in place while the
-   * page scrolls past. */
+  /* Two parts, because the sidebar has two jobs: the outer one fills the
+   * column so the ground and its hairline run the full height of the page;
+   * the inner one is a viewport-tall sticky panel that keeps the filters and
+   * Add book in place while the page scrolls past. */
   .app__side {
     grid-area: side;
     display: block;
-    min-height: calc(100dvh - 64px);
+    min-height: calc(100dvh - var(--bar-height));
     background: var(--surface-raised);
     border-right: 1px solid var(--border);
   }
 
   .app__side-inner {
     position: sticky;
-    top: 64px;
+    top: var(--bar-height);
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
-    height: calc(100dvh - 64px);
+    height: calc(100dvh - var(--bar-height));
     padding: var(--space-5);
     overflow-y: auto;
   }
@@ -750,44 +1006,21 @@ html { scrollbar-gutter: stable; }
   .app__chips,
   .fab { display: none; }
 
-  .app__content {
-    padding: var(--space-5);
-    padding-bottom: var(--space-5);
-  }
+  .app__content { padding: var(--space-5); }
 
   /* The five-column table. .row__main and .row__meta dissolve so the title,
-   * author and date become columns of the row's own grid.
-   *
-   * The tracks are declared once on the list and each row takes them through
-   * `subgrid`, so every row measures against the same columns — a row is still
-   * its own <button> and its own grid, it just stops inventing widths.
+   * author and date become columns of the row's own grid. The tracks are
+   * declared once on the list and each row takes them through subgrid, so
+   * every row measures against the same columns.
    *
    * Every track but the badge is content-floored and free to shrink, so the
-   * table gives ground in the right order as the window narrows:
-   *
-   *   favourite  `auto`                      always just the heart.
-   *   date read  `minmax(min-content, .5fr)` roomy while there is room, which
-   *                                          is what holds the date clear of
-   *                                          the heart; it takes a share of
-   *                                          the spare width, and once that
-   *                                          share drops below the width of a
-   *                                          date it freezes on the date and
-   *                                          the two sit together.
-   *   title      1.6fr, author 1fr           the rest, in the artboard's
-   *                                          proportion. A fixed 260px author
-   *                                          column, as the wireframe draws
-   *                                          it, eats the whole title as the
-   *                                          window nears the breakpoint; the
-   *                                          system's answer is minmax(), not
-   *                                          a third breakpoint.
-   *
-   * The date stays left-aligned in its track — that is what leaves the gap.
-   * Right-aligning it would pin it to the track's right edge, flush against
-   * the heart at every width, however wide the track grew. */
+   * table gives ground in the right order as the window narrows. The date
+   * stays left-aligned in its track, which is what keeps it clear of the
+   * heart. */
   .list {
     display: grid;
     grid-template-columns:
-      120px minmax(0, 1.6fr) minmax(0, 1fr) minmax(min-content, 0.5fr) auto;
+      100px minmax(0, 1.6fr) minmax(0, 1fr) minmax(min-content, 0.5fr) auto;
   }
 
   .list__head,
@@ -804,7 +1037,8 @@ html { scrollbar-gutter: stable; }
   .row__main,
   .row__meta { display: contents; }
 
-  .row__status { padding: var(--space-3) var(--space-2) var(--space-3) var(--space-4); }
+  /* Every cell takes the header's padding, so the columns line up. */
+  .row__status { padding: var(--space-3) var(--space-4); }
   .row__status .badge { min-width: 0; }
 
   .row__badge-long { display: inline; }
@@ -812,7 +1046,7 @@ html { scrollbar-gutter: stable; }
   .row__sep { display: none; }
 
   .row__title {
-    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-2);
+    padding: var(--space-3) var(--space-4);
     font-size: 14px;
     line-height: 20px;
   }
@@ -828,8 +1062,8 @@ html { scrollbar-gutter: stable; }
     color: var(--ink);
   }
 
-  /* A read book with no date is still a date cell: it shows a dash rather
-   * than collapsing the column. */
+  /* A book with no date is still a date cell: it shows a dash rather than
+   * collapsing the column. */
   .row--undated .row__date {
     display: block;
     color: var(--ink-muted);
@@ -862,10 +1096,7 @@ html { scrollbar-gutter: stable; }
     border-top: 1px solid var(--border);
   }
 
-  .modal__foot > [data-role="delete"] {
-    margin-top: 0;
-    margin-right: auto;
-  }
+  .modal__foot > [data-role="delete"] { margin-right: auto; }
 
   .detail__head {
     flex-direction: row;
@@ -877,10 +1108,20 @@ html { scrollbar-gutter: stable; }
   .detail__names { min-width: 0; }
   .detail__badges { flex: none; }
 
-  .secret__eye {
-    width: 32px;
-    min-height: 32px;
-  }
-
+  .secret__eye { width: 32px; min-height: 32px; }
   .secret .field-input { padding-right: var(--space-7); }
 }
+
+/* ─── Large desktop ─────────────────────────────────────────────────────── */
+
+@media (min-width: 75rem) {
+  .app__bar { padding-inline: var(--space-6); }
+  .app__content { padding: var(--space-6); }
+}
+
+/* ─── Mono swap, last word ──────────────────────────────────────────────
+ * Anything read as a value rather than prose — dates, IDs, the token — is
+ * mono. `.mono` has to out-rank the controls that set a family of their own
+ * and ties with them on specificity, so it is declared last on purpose. */
+
+.mono { font-family: var(--font-mono); letter-spacing: 0; }
