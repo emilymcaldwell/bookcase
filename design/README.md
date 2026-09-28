@@ -48,7 +48,7 @@ Greys are true neutral, with no warm or cool tint. Hover and pressed states are 
 
 ### Optional colours
 
-Seven hues, one for each colour of the rainbow, each paired with a soft tint the way `accent` pairs with `accent-soft`. They are **not part of the base palette**: nothing in the system uses them, and most apps never will. An app opts in only to tell categories apart, the way the shelf app colours its status pills, and says so in its own spec.
+Seven hues, one for each colour of the rainbow, each paired with a soft tint the way `accent` pairs with `accent-soft`. They are **not part of the base palette**: nothing in the system uses them, and most apps never will. An app opts in only to tell categories apart.
 
 | Token | Soft partner |
 | --- | --- |
