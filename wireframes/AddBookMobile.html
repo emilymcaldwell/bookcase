@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add book — mobile</title>
+<style>
+@font-face{font-family:"Switzer";src:url(../system/fonts/Switzer-Variable.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Commit Mono";src:url(../system/fonts/CommitMono.woff2) format("woff2");font-weight:200 700;font-style:normal;font-display:swap}
+body{margin:0;display:flex;align-items:flex-start;justify-content:center;font-family:"Switzer",system-ui,-apple-system,sans-serif;background:#f7f7f7;color:#171717}
+button,input,textarea{font-family:inherit}
+input::placeholder,textarea::placeholder{color:#676767}
+a{color:#9b4a60}a:hover{color:color-mix(in oklab,#9b4a60 88%,#171717)}
+[data-hover="ghost"]:hover{background:color-mix(in oklab,#ececec 94%,#171717);color:#171717}
+[data-hover="secondary"]:hover{background:color-mix(in oklab,#ffffff 93%,#171717);border-color:color-mix(in oklab,#d4d4d4 80%,#171717)}
+[data-hover="primary"]:hover{background:color-mix(in oklab,#9b4a60 88%,#171717)}
+.radio{flex:none;width:20px;height:20px;margin:0;display:grid;place-content:center;appearance:none;-webkit-appearance:none;background:#ffffff;border:1px solid #d4d4d4;border-radius:9999px;cursor:pointer}
+.radio::after{content:"";width:8px;height:8px;border-radius:9999px;background:#ffffff;opacity:0}
+.radio:checked,.radio-on{background:#9b4a60;border-color:#9b4a60}
+.radio:checked::after,.radio-on::after{opacity:1}
+.switch{position:relative;display:block;width:44px;height:24px;flex:none;margin:0;appearance:none;-webkit-appearance:none;background:#d4d4d4;border:1px solid #d4d4d4;border-radius:9999px;cursor:pointer}
+.switch::after{content:"";position:absolute;top:1px;left:1px;width:20px;height:20px;border-radius:9999px;background:#ffffff}
+.switch:checked,.switch-on{background:#9b4a60;border-color:#9b4a60}
+.switch:checked::after,.switch-on::after{left:auto;right:1px;background:#ffffff}
+</style>
+</head>
+<body>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; background: rgba(0, 0, 0, 0.5);">
+
+<div style="max-height: 780px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #ffffff; color: #171717; border-top: 1px solid #d4d4d4; border-top-left-radius: 16px; border-top-right-radius: 16px;">
+
+<header style="height: 64px; flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 8px 0 16px; border-bottom: 1px solid #d4d4d4;">
+<h2 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em;">Add book</h2>
+<button type="button" aria-label="Close" data-hover="ghost" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; border: none; border-radius: 8px; color: #171717; cursor: pointer;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6l-12 12"></path><path d="M6 6l12 12"></path></svg>
+</button>
+</header>
+
+<div style="flex-grow: 1; min-height: 0; overflow-y: auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; padding: 16px 16px 48px;">
+
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<label for="title" style="font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.02em; color: #676767;">Title</label>
+<input id="title" type="text" placeholder="Piranesi" style="width: 100%; box-sizing: border-box; min-height: 40px; padding: 8px 12px; background: #ffffff; border: 1px solid #d4d4d4; border-radius: 8px; outline: none; color: #171717; font-size: 16px; line-height: 24px;">
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<label for="author" style="font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.02em; color: #676767;">Author</label>
+<input id="author" type="text" placeholder="Susanna Clarke" style="width: 100%; box-sizing: border-box; min-height: 40px; padding: 8px 12px; background: #ffffff; border: 1px solid #d4d4d4; border-radius: 8px; outline: none; color: #171717; font-size: 16px; line-height: 24px;">
+</div>
+
+<fieldset style="margin: 0; padding: 0; border: none; display: flex; flex-direction: column; gap: 8px;">
+<legend style="padding: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.02em; color: #676767;">Status</legend>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-top: 8px">
+<label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 16px; line-height: 24px;">
+<input type="radio" name="status" class="radio">
+<span>Reading</span>
+</label>
+<label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 16px; line-height: 24px;">
+<input type="radio" name="status" class="radio">
+<span>To read</span>
+</label>
+<label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 16px; line-height: 24px;">
+<input type="radio" name="status" class="radio">
+<span>Read</span>
+</label>
+<label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 16px; line-height: 24px;">
+<input type="radio" name="status" class="radio">
+<span>Dropped</span>
+</label>
+</div>
+</fieldset>
+
+<label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 16px; line-height: 24px; justify-content: space-between">
+<span>Favourite</span><input type="checkbox" role="switch" class="switch">
+</label>
+
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<label for="notes" style="font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.02em; color: #676767;">Notes</label>
+<textarea id="notes" rows="4" placeholder="What you want to remember about it." style="width: 100%; box-sizing: border-box; min-height: 96px; padding: 8px 12px; background: #ffffff; border: 1px solid #d4d4d4; border-radius: 8px; outline: none; color: #171717; font-size: 16px; line-height: 24px; resize: vertical;"></textarea>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<button type="button" data-hover="primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 16px; background: #9b4a60; border: none; border-radius: 8px; color: #ffffff; font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer;">Add book</button>
+<button type="button" data-hover="secondary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 16px; background: #ffffff; border: 1px solid #d4d4d4; border-radius: 8px; color: #171717; font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer;">Cancel</button>
+</div>
+
+</div>
+
+</div>
+
+</div>
+</body>
+</html>

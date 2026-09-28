@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book details — desktop</title>
+<style>
+@font-face{font-family:"Switzer";src:url(../system/fonts/Switzer-Variable.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Commit Mono";src:url(../system/fonts/CommitMono.woff2) format("woff2");font-weight:200 700;font-style:normal;font-display:swap}
+body{margin:0;display:flex;align-items:flex-start;justify-content:center;font-family:"Switzer",system-ui,-apple-system,sans-serif;background:#f7f7f7;color:#171717}
+button,input,textarea{font-family:inherit}
+a{color:#9b4a60}a:hover{color:color-mix(in oklab,#9b4a60 88%,#171717)}
+[data-hover="ghost"]:hover{background:color-mix(in oklab,#ececec 94%,#171717);color:#171717}
+[data-hover="secondary"]:hover{background:color-mix(in oklab,#ffffff 93%,#171717);border-color:color-mix(in oklab,#d4d4d4 80%,#171717)}
+[data-hover="primary"]:hover{background:color-mix(in oklab,#9b4a60 88%,#171717)}
+[data-hover="danger"]:hover{background:color-mix(in oklab,#ba1a1a 14%,#ffffff);color:color-mix(in oklab,#ba1a1a 88%,#171717);border-color:color-mix(in oklab,#ba1a1a 88%,#171717)}
+</style>
+</head>
+<body>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5);">
+
+<div style="width: 520px; background: #ffffff; border: 1px solid #d4d4d4; border-radius: 16px; overflow: hidden;">
+
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 16px 16px 24px; border-bottom: 1px solid #d4d4d4;">
+<h2 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em;">Book details</h2>
+<button type="button" aria-label="Close" data-hover="ghost" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; border: none; border-radius: 8px; color: #171717; cursor: pointer;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6l-12 12"></path><path d="M6 6l12 12"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-direction: column; gap: 24px; padding: 24px;">
+
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+<h3 style="margin: 0; font-size: 24px; line-height: 30px; font-weight: 600; letter-spacing: -0.015em;">Piranesi</h3>
+<p style="margin: 0; font-size: 16px; line-height: 24px; color: #676767;">Susanna Clarke</p>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-top: 4px;">
+<span style="display: inline-flex; align-items: center; min-height: 24px; padding: 4px 12px; background: #ececec; border-radius: 9999px; color: #676767; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.02em;">Read</span>
+<span style="display: inline-flex; align-items: center; gap: 4px; min-height: 24px; padding: 4px 12px; background: #f2e5e7; border-radius: 9999px; color: #9b4a60; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.02em;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; width: 14px; height: 14px"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path></svg>
+<span>Favourite</span>
+</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<p style="margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.02em; color: #676767;">Date read</p>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; box-sizing: border-box; padding: 8px 12px; background: #ececec; border-radius: 8px;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#676767" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12"></path><path d="M16 3v4"></path><path d="M8 3v4"></path><path d="M4 11h16"></path><path d="M7 14h.013"></path><path d="M10.01 14h.005"></path><path d="M13.01 14h.005"></path><path d="M16.015 14h.005"></path><path d="M13.015 17h.005"></path><path d="M7.01 17h.005"></path><path d="M10.01 17h.005"></path></svg>
+<span style="font-size: 14px; line-height: 20px; font-family: 'Commit Mono', ui-monospace, SFMono-Regular, Menlo, monospace;">2026-03-12</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<p style="margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.02em; color: #676767;">Notes</p>
+<div style="width: 100%; box-sizing: border-box; min-height: 120px; padding: 12px; background: #ececec; border-radius: 8px;">
+<p style="margin: 0; font-size: 14px; line-height: 20px;">Read it in two sittings and then immediately started again. The flooded halls stayed with me for weeks. Lend this to Ros.</p>
+</div>
+</div>
+
+</div>
+
+<footer style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 24px; border-top: 1px solid #d4d4d4;">
+<button type="button" data-hover="danger" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; background: transparent; border: 1px solid #ba1a1a; border-radius: 8px; color: #ba1a1a; font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer;">Delete book</button>
+<button type="button" data-hover="primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; background: #9b4a60; border: none; border-radius: 8px; color: #ffffff; font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer;">Edit book</button>
+</footer>
+
+</div>
+</div>
+</body>
+</html>

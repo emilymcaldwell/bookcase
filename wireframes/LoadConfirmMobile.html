@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Load from cloud confirm — mobile</title>
+<style>
+@font-face{font-family:"Switzer";src:url(../system/fonts/Switzer-Variable.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Commit Mono";src:url(../system/fonts/CommitMono.woff2) format("woff2");font-weight:200 700;font-style:normal;font-display:swap}
+body{margin:0;display:flex;align-items:flex-start;justify-content:center;font-family:"Switzer",system-ui,-apple-system,sans-serif;background:#f7f7f7;color:#171717}
+button,input,textarea{font-family:inherit}
+a{color:#9b4a60}a:hover{color:color-mix(in oklab,#9b4a60 88%,#171717)}
+[data-hover="ghost"]:hover{background:color-mix(in oklab,#ececec 94%,#171717);color:#171717}
+[data-hover="secondary"]:hover{background:color-mix(in oklab,#ffffff 93%,#171717);border-color:color-mix(in oklab,#d4d4d4 80%,#171717)}
+[data-hover="primary"]:hover{background:color-mix(in oklab,#9b4a60 88%,#171717)}
+</style>
+</head>
+<body>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding: 16px; overflow: hidden; background: rgba(0, 0, 0, 0.5);">
+
+<div style="width: 100%; box-sizing: border-box; background: #ffffff; border: 1px solid #d4d4d4; border-radius: 16px; overflow: hidden; color: #171717;">
+
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 8px 8px 16px; border-bottom: 1px solid #d4d4d4;">
+<h2 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em;">Replace your shelf?</h2>
+<button type="button" aria-label="Close" data-hover="ghost" style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; border: none; border-radius: 8px; color: #171717; cursor: pointer;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6l-12 12"></path><path d="M6 6l12 12"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 16px;">
+<p style="margin: 0; font-size: 16px; line-height: 24px;">The <strong style="font-weight: 600;">105 books</strong> on this device will be replaced by whatever is saved in the gist.</p>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #676767;">Anything you have changed here since the last save will be lost.</p>
+<div style="display: flex; align-items: center; gap: 8px; min-height: 40px; box-sizing: border-box; padding: 8px 12px; background: #ececec; border-radius: 8px;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#676767" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="M6.657 18c-2.572 0 -4.657 -2.007 -4.657 -4.483c0 -2.475 2.085 -4.482 4.657 -4.482c.393 -1.762 1.794 -3.2 3.675 -3.773c1.88 -.572 3.956 -.193 5.444 1c1.488 1.19 2.162 3.007 1.77 4.769h.99c1.913 0 3.464 1.56 3.464 3.486c0 1.927 -1.551 3.487 -3.465 3.487h-11.878"></path></svg>
+<span style="flex-grow: 1; font-size: 14px; line-height: 20px;">Last saved</span>
+<span style="font-size: 14px; line-height: 20px; font-family: 'Commit Mono', ui-monospace, SFMono-Regular, Menlo, monospace;">2026-09-18 21:04</span>
+</div>
+</div>
+
+<footer style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-top: 1px solid #d4d4d4;">
+<button type="button" data-hover="primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 16px; background: #9b4a60; border: none; border-radius: 8px; color: #ffffff; font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer;">Replace my shelf</button>
+<button type="button" data-hover="secondary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 16px; background: #ffffff; border: 1px solid #d4d4d4; border-radius: 8px; color: #171717; font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer;">Cancel</button>
+</footer>
+
+</div>
+</div>
+</body>
+</html>
