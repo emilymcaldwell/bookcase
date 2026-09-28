@@ -103,7 +103,7 @@ svg { flex: none; }
 
 /* ─── Button ────────────────────────────────────────────────────────────
  * Three emphasis levels and a danger outline; three heights, 32/40/48.
- * Labels are body-sm at the regular weight. */
+ * Labels are the body-sm size at 600, on every variant. */
 
 .btn {
   display: inline-flex;
@@ -116,7 +116,7 @@ svg { flex: none; }
   border-radius: var(--radius-md);
   background: transparent;
   color: var(--ink);
-  font: 400 14px/20px var(--font-sans);
+  font: 600 14px/20px var(--font-sans);
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
@@ -533,8 +533,9 @@ svg { flex: none; }
 
 /* ─── Filter pills (phone) ──────────────────────────────────────────────
  * badge badge--neutral selectable with aria-pressed. The badge is 24px; a
- * filter is also a touch target, so it grows to the touch height. Nothing
- * else changes — the ground, text and selected state are the badge's. */
+ * filter is also a touch target, so it grows to the touch height and takes
+ * space-4 sides so it stays a pill. Nothing else changes — the ground, text
+ * and selected state are the badge's. */
 
 .chips {
   display: flex;
@@ -549,6 +550,7 @@ svg { flex: none; }
 .chips .badge {
   flex: none;
   min-height: var(--touch);
+  padding-inline: var(--space-4);
   cursor: pointer;
 }
 
@@ -1020,7 +1022,7 @@ svg { flex: none; }
   .list {
     display: grid;
     grid-template-columns:
-      100px minmax(0, 1.6fr) minmax(0, 1fr) minmax(min-content, 0.5fr) auto;
+      120px minmax(0, 1.6fr) minmax(0, 1fr) minmax(min-content, 0.5fr) auto;
   }
 
   .list__head,

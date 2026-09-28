@@ -129,9 +129,11 @@ clears the query.
 
 The sidebar filters become one row of pills that scrolls sideways, in the same
 order, with the same single-select behaviour. These are neutral badges used as
-filter chips — `badge badge--neutral selectable` with `aria-pressed`: hover is
-a neutral step toward `ink`, selected is `accent-soft` with `accent` text. The
-wireframe draws them as bordered white pills, which is wrong; follow the system.
+filter chips — `badge badge--neutral selectable` with `aria-pressed`, at the
+44px touch height with `space-4` side padding, as the system's badge rules
+say: hover is a neutral step toward `ink`, selected is `accent-soft` with
+`accent` text. The wireframe draws them as bordered white pills, which is
+wrong; follow the system.
 
 Each row is badge / (title stacked over author · date read) / heart, and the
 whole row is the tap target. Add book becomes a floating button, bottom right.

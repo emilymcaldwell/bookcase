@@ -89,7 +89,7 @@ Every colour token is declared once, as a `light-dark()` pair of its two values:
 
 ## Type
 
-Two typefaces: **Switzer** for everything, **Commit Mono** for code and values. Only two weights: 400 regular and 600 for headings and labels.
+Two typefaces: **Switzer** for everything, **Commit Mono** for code and values. Only two weights: 400 regular, and 600 for headings, labels and button labels.
 
 | Style | Size / line height | Use |
 | --- | --- | --- |
@@ -98,7 +98,7 @@ Two typefaces: **Switzer** for everything, **Commit Mono** for code and values. 
 | `h3` | 18/24 | Card and subsection heading. |
 | `body-lg` | 18/28 | One intro paragraph. |
 | `body` | 16/24 | All running text and inputs. |
-| `body-sm` | 14/20 | Table cells, hints, button labels. |
+| `body-sm` | 14/20 | Table cells, hints. Button labels use this size at 600. |
 | `label` | 12/16, semibold | Field labels, badges, table headers. |
 | `code` | 14/20 mono | Code, and values in tables. |
 | `code-sm` | 12/16 mono | Timestamps and IDs next to a label. |
@@ -130,6 +130,7 @@ There's no heading below `h3`. If you need one, the page is too deep.
 - Icon (`ink` text, no fill, no border) is the icon-only button in a header or toolbar: sort, search, settings, the theme switcher, a close cross. It is not a ghost button; a row of rose icons would read as a row of links. Hover is the neutral step, and when it holds something open or is pressed it takes `accent-soft` with `accent` text, like any selected item. It always has an accessible label.
 - Danger (`danger` outline and text) is only the button that actually deletes. The button that *opens* a confirmation is an ordinary secondary or ghost button. Label it with what it destroys: "Delete workspace". On hover it gains a `danger-soft` background; the border and text stay the same red.
 - Three heights: 32, 40, 48px. Don't mix sizes in one row.
+- Labels are `body-sm` size at 600, on every variant. A button is an action, so its label carries the weight of a heading, not of running text.
 
 **Fields**
 
@@ -161,6 +162,7 @@ There's no heading below `h3`. If you need one, the page is too deep.
 - Default is `accent` text on `accent-soft`. Neutral is `ink-muted` on `surface-sunken`. Solid (`accent` fill) is for counts, at most once per view.
 - Coloured, only in an app that has opted into the optional colours, is a hue on its own soft tint: `green` on `green-soft`. It tells categories apart, nothing more.
 - No borders, and never `danger`.
+- A badge used as a filter chip is a `<button>` with `aria-pressed`. It grows to the 44px touch height and takes `space-4` side padding, so it stays a pill rather than a squashed badge. Hover and selected follow the selection rules.
 
 **Selection vs hover**
 
